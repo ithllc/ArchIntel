@@ -177,7 +177,7 @@ export function VoicePanel({ diagramFile, onPipelineTrigger, pipelineStatus, thr
       const tokenData = await tokenResp.json();
       if (tokenData.error) throw new Error(tokenData.error);
 
-      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${tokenData.apiKey}`;
+      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?access_token=${tokenData.token}`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
