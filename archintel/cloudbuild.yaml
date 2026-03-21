@@ -32,6 +32,8 @@ steps:
       - 'us-central1'
       - '--platform'
       - 'managed'
+      - '--update-secrets'
+      - 'GOOGLE_GENERATIVE_AI_API_KEY=gemini-api-key:latest'
       - '--quiet'
 
 options:
