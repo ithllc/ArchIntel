@@ -173,16 +173,34 @@ export function VoicePanel({ diagramFile, onPipelineTrigger, pipelineStatus, thr
     costInjectedRef.current = false;
 
     try {
-      const tokenResp = await fetch('/api/ephemeral-token');
-      const tokenData = await tokenResp.json();
+      // Parallel: fetch token + request mic + prep diagram all at once
+      const [tokenData, micStream, diagramB64] = await Promise.all([
+        fetch('/api/ephemeral-token').then(r => r.json()),
+        navigator.mediaDevices.getUserMedia({
+          audio: { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+        }).catch(() => null),
+        diagramFile ? diagramFile.arrayBuffer().then(buf => arrayBufferToBase64(buf)) : Promise.resolve(null),
+      ]);
+
       if (tokenData.error) throw new Error(tokenData.error);
+      if (!micStream) {
+        setError('Could not access microphone. Please allow microphone permissions.');
+        setIsConnecting(false);
+        return;
+      }
+
+      // Trigger automated analysis pipeline early (before WS connects)
+      if (diagramFile && onPipelineTrigger) {
+        onPipelineTrigger(diagramFile);
+      }
 
       const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${tokenData.apiKey}`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
+      streamRef.current = micStream;
 
       ws.onopen = () => {
-        const setupConfig = {
+        ws.send(JSON.stringify({
           setup: {
             model: `models/${tokenData.model}`,
             generationConfig: {
@@ -222,8 +240,7 @@ When citing specific numbers or findings, say "according to our analysis" to ind
               }]
             }
           }
-        };
-        ws.send(JSON.stringify(setupConfig));
+        }));
       };
 
       ws.onmessage = async (event) => {
@@ -234,58 +251,34 @@ When citing specific numbers or findings, say "according to our analysis" to ind
           setIsConnected(true);
           setIsConnecting(false);
 
-          // Trigger automated analysis pipeline
-          if (diagramFile && onPipelineTrigger) {
-            onPipelineTrigger(diagramFile);
-          }
+          // Start audio capture immediately (mic already acquired)
+          const audioCtx = new AudioContext();
+          audioContextRef.current = audioCtx;
+          const source = audioCtx.createMediaStreamSource(micStream);
+          const processor = audioCtx.createScriptProcessor(512, 1, 1);
+          processorRef.current = processor;
 
-          // Start microphone
-          try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-              audio: {
-                channelCount: 1,
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true,
-              }
-            });
-            streamRef.current = stream;
-
-            const audioCtx = new AudioContext();
-            audioContextRef.current = audioCtx;
-
-            const source = audioCtx.createMediaStreamSource(stream);
-            const processor = audioCtx.createScriptProcessor(512, 1, 1);
-            processorRef.current = processor;
-
-            processor.onaudioprocess = (e) => {
-              if (isMutedRef.current || ws.readyState !== WebSocket.OPEN) return;
-              const inputData = e.inputBuffer.getChannelData(0);
-              const downsampled = downsample(inputData, audioCtx.sampleRate, 16000);
-              const pcm16 = float32ToInt16(downsampled);
-              const b64 = arrayBufferToBase64(pcm16.buffer);
-
-              ws.send(JSON.stringify({
-                realtimeInput: {
-                  audio: { data: b64, mimeType: 'audio/pcm;rate=16000' }
-                }
-              }));
-            };
-
-            source.connect(processor);
-            processor.connect(audioCtx.destination);
-          } catch (micErr) {
-            console.error('Microphone error:', micErr);
-            setError('Could not access microphone. Please allow microphone permissions.');
-          }
-
-          // Send diagram if available
-          if (diagramFile) {
-            const buffer = await diagramFile.arrayBuffer();
-            const b64 = arrayBufferToBase64(buffer);
+          processor.onaudioprocess = (e) => {
+            if (isMutedRef.current || ws.readyState !== WebSocket.OPEN) return;
+            const inputData = e.inputBuffer.getChannelData(0);
+            const downsampled = downsample(inputData, audioCtx.sampleRate, 16000);
+            const pcm16 = float32ToInt16(downsampled);
+            const b64 = arrayBufferToBase64(pcm16.buffer);
             ws.send(JSON.stringify({
               realtimeInput: {
-                video: { data: b64, mimeType: diagramFile.type || 'image/jpeg' }
+                audio: { data: b64, mimeType: 'audio/pcm;rate=16000' }
+              }
+            }));
+          };
+
+          source.connect(processor);
+          processor.connect(audioCtx.destination);
+
+          // Send diagram immediately (already base64-encoded in parallel)
+          if (diagramB64 && diagramFile) {
+            ws.send(JSON.stringify({
+              realtimeInput: {
+                video: { data: diagramB64, mimeType: diagramFile.type || 'image/jpeg' }
               }
             }));
             ws.send(JSON.stringify({
