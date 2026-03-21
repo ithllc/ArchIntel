@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 650" font-family="Arial, sans-serif" font-size="12">
+  <rect width="950" height="650" fill="#1a1a2e" rx="8"/>
+  <text x="475" y="25" text-anchor="middle" fill="#e0e0e0" font-size="16" font-weight="bold">GCP Event-Driven Microservices — FinTech Platform</text>
+  <text x="475" y="42" text-anchor="middle" fill="#888" font-size="10">Difficulty: Hard — GKE + Cloud Run + Pub/Sub + Spanner + Vertex AI + Apigee</text>
+
+  <!-- External -->
+  <rect x="50" y="60" width="100" height="40" rx="8" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="100" y="85" text-anchor="middle" fill="#63b3ed" font-size="10">Web Portal</text>
+  <rect x="170" y="60" width="100" height="40" rx="8" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="220" y="85" text-anchor="middle" fill="#63b3ed" font-size="10">Mobile Apps</text>
+  <rect x="290" y="60" width="100" height="40" rx="8" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="340" y="85" text-anchor="middle" fill="#63b3ed" font-size="10">Partner Banks</text>
+  <rect x="410" y="60" width="100" height="40" rx="8" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="460" y="85" text-anchor="middle" fill="#63b3ed" font-size="10">IoT / POS</text>
+
+  <!-- Edge -->
+  <rect x="50" y="120" width="210" height="40" rx="8" fill="#2d3748" stroke="#f56565" stroke-width="2"/>
+  <text x="155" y="145" text-anchor="middle" fill="#f56565" font-size="11">Cloud Armor + reCAPTCHA</text>
+
+  <rect x="280" y="120" width="230" height="40" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="395" y="145" text-anchor="middle" fill="#f6ad55" font-size="11">Apigee API Gateway (Rate Limit + OAuth2)</text>
+
+  <!-- Global LB -->
+  <rect x="140" y="180" width="280" height="35" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="280" y="202" text-anchor="middle" fill="#f6ad55" font-size="11">Global HTTPS Load Balancer + Cloud CDN</text>
+
+  <!-- GKE -->
+  <rect x="30" y="235" width="520" height="175" rx="8" fill="rgba(66,153,225,0.08)" stroke="#4299e1" stroke-width="1.5"/>
+  <text x="50" y="255" fill="#4299e1" font-size="11" font-weight="bold">GKE Cluster (Private, Autopilot) + Istio Service Mesh</text>
+
+  <rect x="45" y="265" width="115" height="60" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="102" y="288" text-anchor="middle" fill="#e0e0e0" font-size="10">Account Svc</text>
+  <text x="102" y="303" text-anchor="middle" fill="#68d391" font-size="9">Go · 6 replicas</text>
+  <text x="102" y="315" text-anchor="middle" fill="#888" font-size="8">KYC + Profiles</text>
+
+  <rect x="175" y="265" width="115" height="60" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="232" y="288" text-anchor="middle" fill="#e0e0e0" font-size="10">Payment Svc</text>
+  <text x="232" y="303" text-anchor="middle" fill="#b794f4" font-size="9">Java · 8 replicas</text>
+  <text x="232" y="315" text-anchor="middle" fill="#888" font-size="8">PCI-DSS Scope</text>
+
+  <rect x="305" y="265" width="115" height="60" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="362" y="288" text-anchor="middle" fill="#e0e0e0" font-size="10">Ledger Svc</text>
+  <text x="362" y="303" text-anchor="middle" fill="#fc8181" font-size="9">Rust · 4 replicas</text>
+  <text x="362" y="315" text-anchor="middle" fill="#888" font-size="8">Double Entry</text>
+
+  <rect x="432" y="265" width="105" height="60" rx="8" fill="#2d3748" stroke="#f6e05e" stroke-width="2"/>
+  <text x="484" y="288" text-anchor="middle" fill="#e0e0e0" font-size="10">Notif Svc</text>
+  <text x="484" y="303" text-anchor="middle" fill="#f6e05e" font-size="9">Node · 3 replicas</text>
+  <text x="484" y="315" text-anchor="middle" fill="#888" font-size="8">Push + SMS</text>
+
+  <!-- Event layer -->
+  <rect x="45" y="340" width="495" height="35" rx="8" fill="#2d3748" stroke="#ed8936" stroke-width="2"/>
+  <text x="292" y="363" text-anchor="middle" fill="#ed8936" font-size="11">Cloud Pub/Sub (Event Bus — transaction.created, payment.processed, etc.)</text>
+
+  <rect x="45" y="385" width="115" height="50" rx="8" fill="#2d3748" stroke="#f687b3" stroke-width="2"/>
+  <text x="102" y="407" text-anchor="middle" fill="#e0e0e0" font-size="10">Cloud Run</text>
+  <text x="102" y="422" text-anchor="middle" fill="#f687b3" font-size="9">Fraud Detector</text>
+
+  <rect x="175" y="385" width="115" height="50" rx="8" fill="#2d3748" stroke="#f687b3" stroke-width="2"/>
+  <text x="232" y="407" text-anchor="middle" fill="#e0e0e0" font-size="10">Cloud Run</text>
+  <text x="232" y="422" text-anchor="middle" fill="#f687b3" font-size="9">Report Generator</text>
+
+  <rect x="305" y="385" width="115" height="50" rx="8" fill="#2d3748" stroke="#f687b3" stroke-width="2"/>
+  <text x="362" y="407" text-anchor="middle" fill="#e0e0e0" font-size="10">Cloud Run</text>
+  <text x="362" y="422" text-anchor="middle" fill="#f687b3" font-size="9">Compliance Audit</text>
+
+  <rect x="432" y="385" width="105" height="50" rx="8" fill="#2d3748" stroke="#f687b3" stroke-width="2"/>
+  <text x="484" y="407" text-anchor="middle" fill="#e0e0e0" font-size="10">Cloud Run</text>
+  <text x="484" y="422" text-anchor="middle" fill="#f687b3" font-size="9">ETL Pipeline</text>
+
+  <!-- ML -->
+  <rect x="570" y="235" width="350" height="100" rx="8" fill="rgba(246,173,85,0.08)" stroke="#f6ad55" stroke-width="1"/>
+  <text x="590" y="255" fill="#f6ad55" font-size="10" font-weight="bold">AI / ML Platform</text>
+  <rect x="585" y="265" width="150" height="55" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="660" y="288" text-anchor="middle" fill="#e0e0e0" font-size="10">Vertex AI</text>
+  <text x="660" y="303" text-anchor="middle" fill="#f6ad55" font-size="9">Fraud ML Model</text>
+  <text x="660" y="315" text-anchor="middle" fill="#888" font-size="8">Real-time inference</text>
+
+  <rect x="755" y="265" width="150" height="55" rx="8" fill="#2d3748" stroke="#4fd1c5" stroke-width="2"/>
+  <text x="830" y="288" text-anchor="middle" fill="#e0e0e0" font-size="10">Vertex AI</text>
+  <text x="830" y="303" text-anchor="middle" fill="#4fd1c5" font-size="9">Credit Scoring</text>
+  <text x="830" y="315" text-anchor="middle" fill="#888" font-size="8">Batch + Online</text>
+
+  <!-- Data Tier -->
+  <rect x="570" y="355" width="350" height="165" rx="8" fill="rgba(104,211,145,0.08)" stroke="#68d391" stroke-width="1"/>
+  <text x="590" y="375" fill="#68d391" font-size="10" font-weight="bold">Data Tier (Multi-Region)</text>
+
+  <rect x="585" y="385" width="150" height="50" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="660" y="407" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Spanner</text>
+  <text x="660" y="422" text-anchor="middle" fill="#68d391" font-size="9">Global Transactions</text>
+
+  <rect x="755" y="385" width="150" height="50" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="830" y="407" text-anchor="middle" fill="#e0e0e0" font-size="11">Bigtable</text>
+  <text x="830" y="422" text-anchor="middle" fill="#b794f4" font-size="9">Time-series Ledger</text>
+
+  <rect x="585" y="450" width="150" height="50" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="660" y="472" text-anchor="middle" fill="#e0e0e0" font-size="11">BigQuery</text>
+  <text x="660" y="487" text-anchor="middle" fill="#fc8181" font-size="9">Analytics + Reporting</text>
+
+  <rect x="755" y="450" width="150" height="50" rx="8" fill="#2d3748" stroke="#f6e05e" stroke-width="2"/>
+  <text x="830" y="472" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Storage</text>
+  <text x="830" y="487" text-anchor="middle" fill="#f6e05e" font-size="9">Backups + Exports</text>
+
+  <!-- Observability -->
+  <rect x="30" y="460" width="520" height="55" rx="8" fill="rgba(79,209,197,0.08)" stroke="#4fd1c5" stroke-width="1"/>
+  <text x="290" y="483" text-anchor="middle" fill="#4fd1c5" font-size="11">Observability: Cloud Logging · Cloud Trace · Cloud Monitoring · Error Reporting · SLO Dashboards</text>
+  <text x="290" y="503" text-anchor="middle" fill="#888" font-size="9">OpenTelemetry Collector → Cloud Operations Suite</text>
+
+  <!-- Security -->
+  <rect x="30" y="530" width="890" height="50" rx="8" fill="rgba(245,101,101,0.08)" stroke="#f56565" stroke-width="1"/>
+  <text x="475" y="553" text-anchor="middle" fill="#f56565" font-size="11">Security: VPC Service Controls · Binary Authorization · Workload Identity · KMS (CMEK) · DLP API</text>
+  <text x="475" y="570" text-anchor="middle" fill="#888" font-size="9">SOC2 + PCI-DSS Compliance · Organization Policy Constraints · Security Command Center</text>
+
+  <!-- Arrows -->
+  <defs><marker id="a9" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="280" y1="215" x2="280" y2="235" stroke="#888" stroke-width="1.5" marker-end="url(#a9)"/>
+  <line x1="102" y1="325" x2="102" y2="340" stroke="#888" stroke-width="1" marker-end="url(#a9)"/>
+  <line x1="232" y1="325" x2="232" y2="340" stroke="#888" stroke-width="1" marker-end="url(#a9)"/>
+  <line x1="362" y1="325" x2="362" y2="340" stroke="#888" stroke-width="1" marker-end="url(#a9)"/>
+  <line x1="484" y1="325" x2="484" y2="340" stroke="#888" stroke-width="1" marker-end="url(#a9)"/>
+  <line x1="102" y1="375" x2="102" y2="385" stroke="#888" stroke-width="1" marker-end="url(#a9)"/>
+  <line x1="232" y1="375" x2="232" y2="385" stroke="#888" stroke-width="1" marker-end="url(#a9)"/>
+  <line x1="362" y1="375" x2="362" y2="385" stroke="#888" stroke-width="1" marker-end="url(#a9)"/>
+  <line x1="484" y1="375" x2="484" y2="385" stroke="#888" stroke-width="1" marker-end="url(#a9)"/>
+  <line x1="540" y1="300" x2="585" y2="290" stroke="#888" stroke-width="1.5" marker-end="url(#a9)"/>
+  <line x1="540" y1="380" x2="585" y2="405" stroke="#888" stroke-width="1.5" marker-end="url(#a9)"/>
+  <line x1="540" y1="390" x2="755" y2="405" stroke="#888" stroke-width="1.5" marker-end="url(#a9)"/>
+  <line x1="660" y1="320" x2="660" y2="385" stroke="#888" stroke-width="1" stroke-dasharray="5,3" marker-end="url(#a9)"/>
+</svg>

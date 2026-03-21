@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 550" font-family="Arial, sans-serif" font-size="12">
+  <rect width="850" height="550" fill="#1a1a2e" rx="8"/>
+  <text x="425" y="25" text-anchor="middle" fill="#e0e0e0" font-size="16" font-weight="bold">GCP Three-Tier E-Commerce Platform</text>
+  <text x="425" y="42" text-anchor="middle" fill="#888" font-size="10">Difficulty: Medium — GKE + Cloud SQL + Redis + Cloud Functions + Pub/Sub</text>
+
+  <!-- Internet -->
+  <rect x="345" y="55" width="160" height="35" rx="18" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="425" y="78" text-anchor="middle" fill="#63b3ed" font-size="11">Internet / Customers</text>
+
+  <!-- Cloud Armor -->
+  <rect x="355" y="110" width="140" height="35" rx="8" fill="#2d3748" stroke="#f56565" stroke-width="2"/>
+  <text x="425" y="132" text-anchor="middle" fill="#f56565" font-size="11">Cloud Armor (WAF)</text>
+
+  <!-- Load Balancer -->
+  <rect x="340" y="165" width="170" height="35" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="425" y="187" text-anchor="middle" fill="#f6ad55" font-size="11">Global HTTPS Load Balancer</text>
+
+  <!-- VPC -->
+  <rect x="30" y="220" width="790" height="310" rx="8" fill="none" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <text x="50" y="240" fill="#4a5568" font-size="11">VPC (10.0.0.0/16) — us-central1</text>
+
+  <!-- GKE Cluster -->
+  <rect x="50" y="250" width="370" height="130" rx="8" fill="rgba(66,153,225,0.08)" stroke="#4299e1" stroke-width="1.5"/>
+  <text x="70" y="270" fill="#4299e1" font-size="11" font-weight="bold">GKE Autopilot Cluster</text>
+
+  <rect x="65" y="280" width="105" height="55" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="117" y="303" text-anchor="middle" fill="#e0e0e0" font-size="10">Frontend</text>
+  <text x="117" y="318" text-anchor="middle" fill="#68d391" font-size="9">Next.js · 3 pods</text>
+  <text x="117" y="330" text-anchor="middle" fill="#888" font-size="8">SSR + React</text>
+
+  <rect x="185" y="280" width="105" height="55" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="237" y="303" text-anchor="middle" fill="#e0e0e0" font-size="10">API Gateway</text>
+  <text x="237" y="318" text-anchor="middle" fill="#b794f4" font-size="9">Go · 4 pods</text>
+  <text x="237" y="330" text-anchor="middle" fill="#888" font-size="8">REST + gRPC</text>
+
+  <rect x="305" y="280" width="105" height="55" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="357" y="303" text-anchor="middle" fill="#e0e0e0" font-size="10">Cart Service</text>
+  <text x="357" y="318" text-anchor="middle" fill="#fc8181" font-size="9">Python · 3 pods</text>
+  <text x="357" y="330" text-anchor="middle" fill="#888" font-size="8">Orders + Cart</text>
+
+  <!-- Serverless -->
+  <rect x="50" y="400" width="370" height="55" rx="8" fill="rgba(237,137,54,0.08)" stroke="#ed8936" stroke-width="1"/>
+  <text x="70" y="418" fill="#ed8936" font-size="10">Serverless Functions</text>
+
+  <rect x="65" y="420" width="100" height="30" rx="6" fill="#2d3748" stroke="#ed8936" stroke-width="1.5"/>
+  <text x="115" y="440" text-anchor="middle" fill="#ed8936" font-size="9">Email Notify</text>
+
+  <rect x="180" y="420" width="100" height="30" rx="6" fill="#2d3748" stroke="#ed8936" stroke-width="1.5"/>
+  <text x="230" y="440" text-anchor="middle" fill="#ed8936" font-size="9">Payment Hook</text>
+
+  <rect x="295" y="420" width="110" height="30" rx="6" fill="#2d3748" stroke="#ed8936" stroke-width="1.5"/>
+  <text x="350" y="440" text-anchor="middle" fill="#ed8936" font-size="9">Inventory Sync</text>
+
+  <!-- Message Bus -->
+  <rect x="50" y="470" width="370" height="35" rx="8" fill="#2d3748" stroke="#f6e05e" stroke-width="2"/>
+  <text x="235" y="493" text-anchor="middle" fill="#f6e05e" font-size="11">Cloud Pub/Sub (Event Bus)</text>
+
+  <!-- Data Tier -->
+  <rect x="460" y="250" width="345" height="270" rx="8" fill="rgba(104,211,145,0.08)" stroke="#68d391" stroke-width="1"/>
+  <text x="480" y="270" fill="#68d391" font-size="11" font-weight="bold">Data Tier</text>
+
+  <rect x="475" y="285" width="145" height="55" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="547" y="308" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud SQL</text>
+  <text x="547" y="323" text-anchor="middle" fill="#68d391" font-size="10">PostgreSQL HA</text>
+  <text x="547" y="335" text-anchor="middle" fill="#888" font-size="8">Primary + Replica</text>
+
+  <rect x="645" y="285" width="145" height="55" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="717" y="308" text-anchor="middle" fill="#e0e0e0" font-size="11">Memorystore</text>
+  <text x="717" y="323" text-anchor="middle" fill="#fc8181" font-size="10">Redis Cluster</text>
+  <text x="717" y="335" text-anchor="middle" fill="#888" font-size="8">Session + Cache</text>
+
+  <rect x="475" y="360" width="145" height="55" rx="8" fill="#2d3748" stroke="#f6e05e" stroke-width="2"/>
+  <text x="547" y="383" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Storage</text>
+  <text x="547" y="398" text-anchor="middle" fill="#f6e05e" font-size="10">Product Images</text>
+
+  <rect x="645" y="360" width="145" height="55" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="717" y="383" text-anchor="middle" fill="#e0e0e0" font-size="11">BigQuery</text>
+  <text x="717" y="398" text-anchor="middle" fill="#b794f4" font-size="10">Analytics + BI</text>
+
+  <rect x="475" y="435" width="145" height="50" rx="8" fill="#2d3748" stroke="#4fd1c5" stroke-width="2"/>
+  <text x="547" y="457" text-anchor="middle" fill="#e0e0e0" font-size="11">Secret Manager</text>
+  <text x="547" y="472" text-anchor="middle" fill="#4fd1c5" font-size="10">Keys + DB Creds</text>
+
+  <rect x="645" y="435" width="145" height="50" rx="8" fill="#2d3748" stroke="#f687b3" stroke-width="2"/>
+  <text x="717" y="457" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Logging</text>
+  <text x="717" y="472" text-anchor="middle" fill="#f687b3" font-size="10">+ Monitoring</text>
+
+  <!-- Arrows -->
+  <defs><marker id="a8" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="425" y1="90" x2="425" y2="110" stroke="#888" stroke-width="1.5" marker-end="url(#a8)"/>
+  <line x1="425" y1="145" x2="425" y2="165" stroke="#888" stroke-width="1.5" marker-end="url(#a8)"/>
+  <line x1="425" y1="200" x2="235" y2="250" stroke="#888" stroke-width="1.5" marker-end="url(#a8)"/>
+  <line x1="117" y1="335" x2="237" y2="335" stroke="#888" stroke-width="1" marker-end="url(#a8)"/>
+  <line x1="237" y1="335" x2="357" y2="335" stroke="#888" stroke-width="1" marker-end="url(#a8)"/>
+  <line x1="420" y1="310" x2="475" y2="310" stroke="#888" stroke-width="1.5" marker-end="url(#a8)"/>
+  <line x1="420" y1="320" x2="645" y2="310" stroke="#888" stroke-width="1.5" marker-end="url(#a8)"/>
+  <line x1="420" y1="330" x2="475" y2="380" stroke="#888" stroke-width="1" marker-end="url(#a8)"/>
+  <line x1="235" y1="380" x2="235" y2="400" stroke="#888" stroke-width="1" marker-end="url(#a8)"/>
+  <line x1="235" y1="455" x2="235" y2="470" stroke="#888" stroke-width="1" marker-end="url(#a8)"/>
+</svg>

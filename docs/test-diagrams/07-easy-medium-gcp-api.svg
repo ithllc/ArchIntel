@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 750 380" font-family="Arial, sans-serif" font-size="12">
+  <rect width="750" height="380" fill="#1a1a2e" rx="8"/>
+  <text x="375" y="25" text-anchor="middle" fill="#e0e0e0" font-size="16" font-weight="bold">GCP API Backend</text>
+  <text x="375" y="42" text-anchor="middle" fill="#888" font-size="10">Difficulty: Easy-Medium — Cloud Run + Cloud SQL + Memorystore</text>
+
+  <!-- VPC -->
+  <rect x="175" y="55" width="555" height="305" rx="8" fill="none" stroke="#4a5568" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <text x="195" y="75" fill="#4a5568" font-size="11">VPC Network</text>
+
+  <rect x="30" y="130" width="110" height="55" rx="8" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="85" y="152" text-anchor="middle" fill="#e0e0e0" font-size="11">Mobile + Web</text>
+  <text x="85" y="168" text-anchor="middle" fill="#63b3ed" font-size="10">Clients</text>
+
+  <rect x="195" y="85" width="140" height="45" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="265" y="105" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Load Balancer</text>
+  <text x="265" y="120" text-anchor="middle" fill="#f6ad55" font-size="10">HTTPS + SSL</text>
+
+  <rect x="195" y="155" width="140" height="55" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="265" y="178" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Run</text>
+  <text x="265" y="195" text-anchor="middle" fill="#68d391" font-size="10">API Service (Node.js)</text>
+
+  <rect x="195" y="235" width="140" height="55" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="265" y="258" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Run</text>
+  <text x="265" y="275" text-anchor="middle" fill="#68d391" font-size="10">Worker Service</text>
+
+  <rect x="420" y="90" width="140" height="55" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="490" y="113" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud SQL</text>
+  <text x="490" y="130" text-anchor="middle" fill="#b794f4" font-size="10">PostgreSQL (HA)</text>
+
+  <rect x="420" y="170" width="140" height="55" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="490" y="193" text-anchor="middle" fill="#e0e0e0" font-size="11">Memorystore</text>
+  <text x="490" y="210" text-anchor="middle" fill="#fc8181" font-size="10">Redis (Cache)</text>
+
+  <rect x="420" y="250" width="140" height="55" rx="8" fill="#2d3748" stroke="#f6e05e" stroke-width="2"/>
+  <text x="490" y="273" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Storage</text>
+  <text x="490" y="290" text-anchor="middle" fill="#f6e05e" font-size="10">File Uploads</text>
+
+  <rect x="595" y="130" width="120" height="55" rx="8" fill="#2d3748" stroke="#ed8936" stroke-width="2"/>
+  <text x="655" y="153" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Pub/Sub</text>
+  <text x="655" y="170" text-anchor="middle" fill="#ed8936" font-size="10">Async Tasks</text>
+
+  <rect x="595" y="220" width="120" height="55" rx="8" fill="#2d3748" stroke="#4fd1c5" stroke-width="2"/>
+  <text x="655" y="243" text-anchor="middle" fill="#e0e0e0" font-size="11">Secret Manager</text>
+  <text x="655" y="260" text-anchor="middle" fill="#4fd1c5" font-size="10">API Keys + Creds</text>
+
+  <defs><marker id="a7" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="140" y1="155" x2="195" y2="110" stroke="#63b3ed" stroke-width="2" marker-end="url(#a7)"/>
+  <line x1="265" y1="130" x2="265" y2="155" stroke="#888" stroke-width="1.5" marker-end="url(#a7)"/>
+  <line x1="335" y1="175" x2="420" y2="115" stroke="#888" stroke-width="1.5" marker-end="url(#a7)"/>
+  <line x1="335" y1="185" x2="420" y2="195" stroke="#888" stroke-width="1.5" marker-end="url(#a7)"/>
+  <line x1="335" y1="265" x2="420" y2="275" stroke="#888" stroke-width="1.5" marker-end="url(#a7)"/>
+  <line x1="265" y1="210" x2="265" y2="235" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#a7)"/>
+  <line x1="335" y1="170" x2="595" y2="155" stroke="#ed8936" stroke-width="1.5" marker-end="url(#a7)"/>
+  <line x1="655" y1="185" x2="655" y2="220" stroke="#4fd1c5" stroke-width="1" stroke-dasharray="4,3" marker-end="url(#a7)"/>
+</svg>
