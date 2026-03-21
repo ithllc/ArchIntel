@@ -1,0 +1,172 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 700" font-family="Arial, sans-serif" font-size="12">
+  <rect width="1000" height="700" fill="#1a1a2e" rx="8"/>
+  <text x="500" y="25" text-anchor="middle" fill="#e0e0e0" font-size="16" font-weight="bold">Event-Driven Multi-Cloud Architecture</text>
+  <text x="500" y="42" text-anchor="middle" fill="#888" font-size="10">Difficulty: Hard — AWS + GCP Hybrid with Event Sourcing</text>
+
+  <!-- External Sources -->
+  <rect x="30" y="60" width="120" height="45" rx="8" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="90" y="80" text-anchor="middle" fill="#e0e0e0" font-size="10">Web App</text>
+  <text x="90" y="95" text-anchor="middle" fill="#63b3ed" font-size="9">React SPA</text>
+
+  <rect x="170" y="60" width="120" height="45" rx="8" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="230" y="80" text-anchor="middle" fill="#e0e0e0" font-size="10">Mobile SDK</text>
+  <text x="230" y="95" text-anchor="middle" fill="#63b3ed" font-size="9">iOS + Android</text>
+
+  <rect x="310" y="60" width="120" height="45" rx="8" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="370" y="80" text-anchor="middle" fill="#e0e0e0" font-size="10">IoT Devices</text>
+  <text x="370" y="95" text-anchor="middle" fill="#63b3ed" font-size="9">MQTT Protocol</text>
+
+  <rect x="450" y="60" width="120" height="45" rx="8" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="510" y="80" text-anchor="middle" fill="#e0e0e0" font-size="10">Partner APIs</text>
+  <text x="510" y="95" text-anchor="middle" fill="#63b3ed" font-size="9">REST + GraphQL</text>
+
+  <!-- AWS Region -->
+  <rect x="20" y="130" width="470" height="540" rx="8" fill="none" stroke="#f6ad55" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <text x="40" y="150" fill="#f6ad55" font-size="12" font-weight="bold">AWS (us-east-1)</text>
+
+  <!-- API Gateway -->
+  <rect x="130" y="165" width="160" height="40" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="210" y="190" text-anchor="middle" fill="#f6ad55" font-size="11">API Gateway + WAF</text>
+
+  <!-- Lambda functions -->
+  <rect x="40" y="230" width="110" height="55" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="95" y="253" text-anchor="middle" fill="#e0e0e0" font-size="10">Lambda</text>
+  <text x="95" y="268" text-anchor="middle" fill="#b794f4" font-size="9">Auth Handler</text>
+  <text x="95" y="280" text-anchor="middle" fill="#888" font-size="8">Cognito + JWT</text>
+
+  <rect x="170" y="230" width="110" height="55" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="225" y="253" text-anchor="middle" fill="#e0e0e0" font-size="10">Lambda</text>
+  <text x="225" y="268" text-anchor="middle" fill="#b794f4" font-size="9">Command API</text>
+  <text x="225" y="280" text-anchor="middle" fill="#888" font-size="8">Write Path</text>
+
+  <rect x="300" y="230" width="110" height="55" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="355" y="253" text-anchor="middle" fill="#e0e0e0" font-size="10">Lambda</text>
+  <text x="355" y="268" text-anchor="middle" fill="#b794f4" font-size="9">Query API</text>
+  <text x="355" y="280" text-anchor="middle" fill="#888" font-size="8">Read Path (CQRS)</text>
+
+  <!-- EventBridge -->
+  <rect x="80" y="310" width="350" height="40" rx="8" fill="#2d3748" stroke="#ed8936" stroke-width="2"/>
+  <text x="255" y="335" text-anchor="middle" fill="#ed8936" font-size="11">Amazon EventBridge (Event Bus)</text>
+
+  <!-- Event consumers -->
+  <rect x="40" y="375" width="100" height="50" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="90" y="395" text-anchor="middle" fill="#e0e0e0" font-size="10">SQS Queue</text>
+  <text x="90" y="410" text-anchor="middle" fill="#fc8181" font-size="9">Orders</text>
+
+  <rect x="160" y="375" width="100" height="50" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="210" y="395" text-anchor="middle" fill="#e0e0e0" font-size="10">SQS Queue</text>
+  <text x="210" y="410" text-anchor="middle" fill="#fc8181" font-size="9">Notifications</text>
+
+  <rect x="280" y="375" width="100" height="50" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="330" y="395" text-anchor="middle" fill="#e0e0e0" font-size="10">Kinesis</text>
+  <text x="330" y="410" text-anchor="middle" fill="#fc8181" font-size="9">Analytics Stream</text>
+
+  <rect x="400" y="375" width="75" height="50" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="437" y="395" text-anchor="middle" fill="#e0e0e0" font-size="10">SNS</text>
+  <text x="437" y="410" text-anchor="middle" fill="#fc8181" font-size="9">Fan-out</text>
+
+  <!-- AWS Data stores -->
+  <rect x="40" y="450" width="110" height="50" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="95" y="472" text-anchor="middle" fill="#e0e0e0" font-size="10">DynamoDB</text>
+  <text x="95" y="487" text-anchor="middle" fill="#68d391" font-size="9">Event Store</text>
+
+  <rect x="170" y="450" width="110" height="50" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="225" y="472" text-anchor="middle" fill="#e0e0e0" font-size="10">RDS Aurora</text>
+  <text x="225" y="487" text-anchor="middle" fill="#68d391" font-size="9">Read Models</text>
+
+  <rect x="300" y="450" width="100" height="50" rx="8" fill="#2d3748" stroke="#f6e05e" stroke-width="2"/>
+  <text x="350" y="472" text-anchor="middle" fill="#e0e0e0" font-size="10">S3</text>
+  <text x="350" y="487" text-anchor="middle" fill="#f6e05e" font-size="9">Data Lake</text>
+
+  <rect x="40" y="520" width="110" height="50" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="95" y="542" text-anchor="middle" fill="#e0e0e0" font-size="10">ElastiCache</text>
+  <text x="95" y="557" text-anchor="middle" fill="#b794f4" font-size="9">Redis Cluster</text>
+
+  <rect x="170" y="520" width="110" height="50" rx="8" fill="#2d3748" stroke="#f687b3" stroke-width="2"/>
+  <text x="225" y="542" text-anchor="middle" fill="#e0e0e0" font-size="10">Elasticsearch</text>
+  <text x="225" y="557" text-anchor="middle" fill="#f687b3" font-size="9">Search Index</text>
+
+  <!-- Cross-cloud connector -->
+  <rect x="415" y="455" width="60" height="120" rx="8" fill="#2d3748" stroke="#4fd1c5" stroke-width="2"/>
+  <text x="445" y="500" text-anchor="middle" fill="#4fd1c5" font-size="9" transform="rotate(-90 445 510)">VPN Tunnel</text>
+
+  <!-- GCP Region -->
+  <rect x="510" y="130" width="470" height="540" rx="8" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <text x="530" y="150" fill="#4299e1" font-size="12" font-weight="bold">GCP (us-central1)</text>
+
+  <!-- GCP Services -->
+  <rect x="530" y="170" width="200" height="40" rx="8" fill="#2d3748" stroke="#4299e1" stroke-width="2"/>
+  <text x="630" y="195" text-anchor="middle" fill="#4299e1" font-size="11">Cloud Pub/Sub (Ingestion)</text>
+
+  <rect x="530" y="235" width="140" height="55" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="600" y="258" text-anchor="middle" fill="#e0e0e0" font-size="10">Cloud Run</text>
+  <text x="600" y="273" text-anchor="middle" fill="#68d391" font-size="9">ML Inference</text>
+  <text x="600" y="285" text-anchor="middle" fill="#888" font-size="8">TensorFlow Serving</text>
+
+  <rect x="690" y="235" width="140" height="55" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="760" y="258" text-anchor="middle" fill="#e0e0e0" font-size="10">Cloud Run</text>
+  <text x="760" y="273" text-anchor="middle" fill="#68d391" font-size="9">Data Pipeline</text>
+  <text x="760" y="285" text-anchor="middle" fill="#888" font-size="8">Apache Beam</text>
+
+  <rect x="530" y="315" width="140" height="55" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="600" y="338" text-anchor="middle" fill="#e0e0e0" font-size="10">Vertex AI</text>
+  <text x="600" y="353" text-anchor="middle" fill="#f6ad55" font-size="9">Model Training</text>
+  <text x="600" y="365" text-anchor="middle" fill="#888" font-size="8">AutoML + Custom</text>
+
+  <rect x="690" y="315" width="140" height="55" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="760" y="338" text-anchor="middle" fill="#e0e0e0" font-size="10">Cloud Functions</text>
+  <text x="760" y="353" text-anchor="middle" fill="#f6ad55" font-size="9">Event Processor</text>
+  <text x="760" y="365" text-anchor="middle" fill="#888" font-size="8">Python Workers</text>
+
+  <!-- GCP Data -->
+  <rect x="530" y="400" width="130" height="50" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="595" y="422" text-anchor="middle" fill="#e0e0e0" font-size="10">BigQuery</text>
+  <text x="595" y="437" text-anchor="middle" fill="#fc8181" font-size="9">Analytics DW</text>
+
+  <rect x="680" y="400" width="130" height="50" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="745" y="422" text-anchor="middle" fill="#e0e0e0" font-size="10">Cloud SQL</text>
+  <text x="745" y="437" text-anchor="middle" fill="#b794f4" font-size="9">PostgreSQL</text>
+
+  <rect x="830" y="400" width="130" height="50" rx="8" fill="#2d3748" stroke="#f6e05e" stroke-width="2"/>
+  <text x="895" y="422" text-anchor="middle" fill="#e0e0e0" font-size="10">Cloud Storage</text>
+  <text x="895" y="437" text-anchor="middle" fill="#f6e05e" font-size="9">ML Models</text>
+
+  <!-- GCP Monitoring -->
+  <rect x="530" y="480" width="430" height="70" rx="8" fill="rgba(79,209,197,0.1)" stroke="#4fd1c5" stroke-width="1"/>
+  <text x="745" y="500" text-anchor="middle" fill="#4fd1c5" font-size="11">Observability Stack</text>
+  <rect x="545" y="510" width="95" height="30" rx="6" fill="#2d3748" stroke="#4fd1c5" stroke-width="1"/>
+  <text x="593" y="530" text-anchor="middle" fill="#4fd1c5" font-size="9">Cloud Logging</text>
+  <rect x="650" y="510" width="95" height="30" rx="6" fill="#2d3748" stroke="#4fd1c5" stroke-width="1"/>
+  <text x="698" y="530" text-anchor="middle" fill="#4fd1c5" font-size="9">Cloud Trace</text>
+  <rect x="755" y="510" width="95" height="30" rx="6" fill="#2d3748" stroke="#4fd1c5" stroke-width="1"/>
+  <text x="803" y="530" text-anchor="middle" fill="#4fd1c5" font-size="9">Cloud Monitor</text>
+  <rect x="860" y="510" width="90" height="30" rx="6" fill="#2d3748" stroke="#4fd1c5" stroke-width="1"/>
+  <text x="905" y="530" text-anchor="middle" fill="#4fd1c5" font-size="9">Grafana</text>
+
+  <!-- CI/CD -->
+  <rect x="530" y="580" width="430" height="50" rx="8" fill="rgba(246,173,85,0.1)" stroke="#f6ad55" stroke-width="1"/>
+  <text x="745" y="600" text-anchor="middle" fill="#f6ad55" font-size="10">CI/CD: Cloud Build → Artifact Registry → Cloud Deploy → GKE/Cloud Run</text>
+  <text x="745" y="618" text-anchor="middle" fill="#888" font-size="9">Terraform IaC · GitHub Actions · Policy Controller</text>
+
+  <!-- Arrows -->
+  <defs><marker id="a5" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="210" y1="205" x2="95" y2="230" stroke="#888" stroke-width="1.5" marker-end="url(#a5)"/>
+  <line x1="210" y1="205" x2="225" y2="230" stroke="#888" stroke-width="1.5" marker-end="url(#a5)"/>
+  <line x1="210" y1="205" x2="355" y2="230" stroke="#888" stroke-width="1.5" marker-end="url(#a5)"/>
+  <line x1="225" y1="285" x2="255" y2="310" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="90" y1="350" x2="90" y2="375" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="210" y1="350" x2="210" y2="375" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="330" y1="350" x2="330" y2="375" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="437" y1="350" x2="437" y2="375" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="90" y1="425" x2="90" y2="450" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="210" y1="425" x2="225" y2="450" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="330" y1="425" x2="350" y2="450" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <!-- Cross cloud -->
+  <line x1="475" y1="330" x2="510" y2="190" stroke="#4fd1c5" stroke-width="2" stroke-dasharray="6,3" marker-end="url(#a5)"/>
+  <line x1="630" y1="210" x2="600" y2="235" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="630" y1="210" x2="760" y2="235" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="600" y1="290" x2="600" y2="315" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="760" y1="290" x2="760" y2="315" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="600" y1="370" x2="595" y2="400" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+  <line x1="760" y1="370" x2="745" y2="400" stroke="#888" stroke-width="1" marker-end="url(#a5)"/>
+</svg>

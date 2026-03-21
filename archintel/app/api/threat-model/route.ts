@@ -1,6 +1,7 @@
 import { streamText, tool } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
+import { supabase } from '@/lib/supabase';
 
 export const maxDuration = 60;
 
@@ -15,6 +16,16 @@ export async function POST(req: Request) {
 
     const buffer = Buffer.from(await image.arrayBuffer());
     const mimeType = image.type || 'image/png';
+    const diagramHash = `${image.name}-${image.size}-${Date.now()}`;
+
+    // Create threat model record in Supabase
+    const { data: threatModelRow } = await supabase
+      .from('threat_models')
+      .insert({ diagram_hash: diagramHash, stride_analysis: {} })
+      .select('id')
+      .single();
+
+    const threatModelId = threatModelRow?.id;
 
     const result = streamText({
       model: google('gemini-1.5-pro'),
@@ -72,9 +83,27 @@ After your analysis, use the generateTerraform tool to create IAM/security polic
             severity: z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']),
           }),
           execute: async ({ threatName, filename, content, severity }) => {
+            // Save generated policy to Supabase
+            await supabase.from('generated_policies').insert({
+              threat_model_id: threatModelId,
+              threat_name: threatName,
+              severity,
+              filename,
+              content,
+            });
+
             return { saved: true, filename, threatName, severity, content };
           },
         }),
+      },
+      onFinish: async ({ text }) => {
+        // Update threat model with final STRIDE analysis
+        if (threatModelId) {
+          await supabase
+            .from('threat_models')
+            .update({ stride_analysis: { raw_text: text } })
+            .eq('id', threatModelId);
+        }
       },
     });
 

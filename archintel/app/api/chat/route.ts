@@ -2,6 +2,7 @@ import { streamText, tool } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
 import { CLOUD_PRICING } from '@/lib/pricing-data';
+import { supabase } from '@/lib/supabase';
 
 export const maxDuration = 60;
 
@@ -90,6 +91,13 @@ Format cost breakdowns as clean tables. Always end with 1-2 optimization suggest
 
             const totalMonthlyCost = breakdown.reduce((sum, s) => sum + s.monthlyCost, 0);
 
+            // Save cost estimate to Supabase
+            await supabase.from('cost_estimates').insert({
+              diagram_hash: `cost-${Date.now()}`,
+              services: breakdown,
+              total_monthly_cost: Math.round(totalMonthlyCost * 100) / 100,
+            });
+
             return {
               breakdown,
               totalMonthlyCost: Math.round(totalMonthlyCost * 100) / 100,
@@ -97,6 +105,13 @@ Format cost breakdowns as clean tables. Always end with 1-2 optimization suggest
             };
           },
         }),
+      },
+      onFinish: async ({ text }) => {
+        // Save chat log to Supabase
+        await supabase.from('chat_logs').insert({
+          session_id: `chat-${Date.now()}`,
+          messages: { summary: text },
+        });
       },
     });
 

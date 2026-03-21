@@ -1,6 +1,6 @@
 # ArchIntel System Architecture
 
-> **Version:** 1.0
+> **Version:** 1.1
 > **Last Updated:** 2026-03-21
 > **Status:** Production (Google Cloud Run)
 
@@ -34,12 +34,19 @@ graph TB
     end
 
     subgraph Google["Google Cloud"]
-        SecretMgr[Secret Manager<br/>gemini-api-key]
+        SecretMgr[Secret Manager<br/>gemini-api-key<br/>supabase-url<br/>supabase-anon-key]
         Gemini15[Gemini 1.5 Pro<br/>Vision + Text]
         GeminiFlash[Gemini 2.5 Flash<br/>Native Audio]
         CloudRun[Cloud Run<br/>us-central1]
         AR[Artifact Registry<br/>Docker Images]
         CloudBuild[Cloud Build<br/>CI/CD Trigger]
+    end
+
+    subgraph Supabase["Supabase (PostgreSQL)"]
+        ThreatTable[threat_models<br/>STRIDE analysis results]
+        PolicyTable[generated_policies<br/>Terraform remediation files]
+        CostTable[cost_estimates<br/>Service cost breakdowns]
+        ChatTable[chat_logs<br/>Conversation history]
     end
 
     subgraph GitHub["GitHub"]
@@ -58,6 +65,11 @@ graph TB
     ThreatAPI -->|Vercel AI SDK| Gemini15
     ChatAPI -->|Vercel AI SDK| Gemini15
     TokenAPI -->|API Key| VoiceClient
+
+    ThreatAPI -->|Insert| ThreatTable
+    ThreatAPI -->|Insert| PolicyTable
+    ChatAPI -->|Insert| CostTable
+    ChatAPI -->|Insert| ChatTable
 
     VoiceClient -.->|Direct WebSocket<br/>PCM16 Audio + Image| GeminiFlash
 
@@ -144,8 +156,10 @@ sequenceDiagram
     end
 
     Gemini->>Tool: generateTerraform()<br/>(threatName, filename, HCL content)
+    Tool->>Tool: Save to Supabase<br/>(generated_policies table)
     Tool-->>Gemini: { saved: true, filename }
     Gemini-->>API: Continue with summary
+    API->>API: Save STRIDE analysis<br/>to Supabase (threat_models)
     API-->>Browser: Tool results + text
 
     Browser->>Browser: Render Terraform<br/>with syntax highlighting
@@ -229,9 +243,13 @@ graph LR
 ```mermaid
 graph TD
     SM[Google Cloud<br/>Secret Manager] -->|"gemini-api-key:latest"| CR[Cloud Run Service]
-    CR -->|"GOOGLE_GENERATIVE_AI_API_KEY<br/>(env var)"| App[Next.js Application]
-    App --> ThreatRoute[/api/threat-model<br/>Vercel AI SDK reads env]
-    App --> ChatRoute[/api/chat<br/>Vercel AI SDK reads env]
+    SM -->|"supabase-url:latest"| CR
+    SM -->|"supabase-anon-key:latest"| CR
+    CR -->|"GOOGLE_GENERATIVE_AI_API_KEY"| App[Next.js Application]
+    CR -->|"NEXT_PUBLIC_SUPABASE_URL"| App
+    CR -->|"NEXT_PUBLIC_SUPABASE_ANON_KEY"| App
+    App --> ThreatRoute[/api/threat-model<br/>Vercel AI SDK + Supabase]
+    App --> ChatRoute[/api/chat<br/>Vercel AI SDK + Supabase]
     App --> TokenRoute[/api/ephemeral-token<br/>Returns key for WebSocket]
 
     CB[Cloud Build] -->|"--update-secrets flag"| CR
@@ -240,11 +258,18 @@ graph TD
     style CR fill:#34a853,color:#fff
 ```
 
+**Managed Secrets:**
+| Secret Name | Environment Variable | Purpose |
+|------------|---------------------|---------|
+| `gemini-api-key` | `GOOGLE_GENERATIVE_AI_API_KEY` | Gemini API access for all AI features |
+| `supabase-url` | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project endpoint |
+| `supabase-anon-key` | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anonymous client key |
+
 **Secret Flow:**
-1. API key stored in Google Cloud Secret Manager as `gemini-api-key`
-2. Cloud Run mounts the secret as the `GOOGLE_GENERATIVE_AI_API_KEY` environment variable
-3. Cloud Build's deploy step uses `--update-secrets` to ensure the secret binding persists across deployments
-4. The key is **never** stored in source code, environment files, or build configurations
+1. All secrets stored in Google Cloud Secret Manager
+2. Cloud Run mounts secrets as environment variables at runtime
+3. Cloud Build's deploy step uses `--update-secrets` to ensure bindings persist across deployments
+4. Secrets are **never** stored in source code, environment files, or build configurations
 
 ---
 
@@ -300,10 +325,57 @@ archintel/
 | CI/CD | Google Cloud Build | Managed |
 | Secrets | Google Cloud Secret Manager | Managed |
 | Container Registry | Google Artifact Registry | Managed |
+| Database | Supabase (PostgreSQL) | Managed |
 
 ---
 
-## 7. Security Considerations
+## 7. Data Persistence (Supabase)
+
+All analysis results are persisted to Supabase PostgreSQL for audit trails and history.
+
+| Table | Purpose | Written By |
+|-------|---------|-----------|
+| `threat_models` | STRIDE analysis text per diagram | `/api/threat-model` (onFinish) |
+| `generated_policies` | Terraform .tf files with threat name + severity | `generateTerraform` tool |
+| `cost_estimates` | Service breakdown + total monthly cost | `calculateCost` tool |
+| `chat_logs` | Conversation summaries | `/api/chat` (onFinish) |
+
+```mermaid
+erDiagram
+    threat_models {
+        uuid id PK
+        text diagram_hash
+        jsonb stride_analysis
+        timestamptz created_at
+    }
+    generated_policies {
+        uuid id PK
+        uuid threat_model_id FK
+        text threat_name
+        text severity
+        text filename
+        text content
+        timestamptz created_at
+    }
+    cost_estimates {
+        uuid id PK
+        text diagram_hash
+        jsonb services
+        numeric total_monthly_cost
+        timestamptz created_at
+    }
+    chat_logs {
+        uuid id PK
+        text session_id
+        jsonb messages
+        timestamptz created_at
+    }
+    threat_models ||--o{ generated_policies : "has many"
+```
+
+---
+
+## 8. Security Considerations
 
 | Concern | Mitigation |
 |---------|-----------|

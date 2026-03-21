@@ -33,7 +33,7 @@ steps:
       - '--platform'
       - 'managed'
       - '--update-secrets'
-      - 'GOOGLE_GENERATIVE_AI_API_KEY=gemini-api-key:latest'
+      - 'GOOGLE_GENERATIVE_AI_API_KEY=gemini-api-key:latest,NEXT_PUBLIC_SUPABASE_URL=supabase-url:latest,NEXT_PUBLIC_SUPABASE_ANON_KEY=supabase-anon-key:latest'
       - '--quiet'
 
 options:

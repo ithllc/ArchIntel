@@ -145,6 +145,32 @@ CostSight recognizes and prices the following services:
 
 ---
 
+## Data Persistence
+
+All analysis results are automatically saved to the Supabase database:
+
+- **Security tab:** STRIDE analysis text and generated Terraform files are stored for audit trails.
+- **Cost tab:** Service breakdowns and total cost estimates are saved for historical comparison.
+- **Chat logs:** Conversation summaries are persisted for review.
+
+No action is needed — persistence happens automatically in the background.
+
+---
+
+## Test Diagrams
+
+Five pre-built SVG architecture diagrams are included in `docs/test-diagrams/` for testing:
+
+| File | Difficulty | Architecture |
+|------|-----------|-------------|
+| `01-easy-static-website.svg` | Easy | CloudFront + S3 + Route 53 |
+| `02-easy-api-backend.svg` | Easy-Medium | ALB + EC2 + RDS + ElastiCache |
+| `03-medium-three-tier-web.svg` | Medium | WAF + CloudFront + ALB + ASG + RDS Multi-AZ + ElastiCache |
+| `04-hard-microservices.svg` | Hard | GKE + 5 microservices + Pub/Sub + Istio + Cloud SQL + BigQuery |
+| `05-hard-event-driven-multi-cloud.svg` | Hard | AWS + GCP hybrid, Lambda + EventBridge + Cloud Run + Vertex AI + CQRS |
+
+---
+
 ## Troubleshooting
 
 | Issue | Solution |
@@ -173,5 +199,7 @@ npm run dev
 
 Open http://localhost:3000 in your browser.
 
-**Required environment variable:**
+**Required environment variables:**
 - `GOOGLE_GENERATIVE_AI_API_KEY` — Your Google Gemini API key from [Google AI Studio](https://aistudio.google.com/apikey)
+- `NEXT_PUBLIC_SUPABASE_URL` — Your Supabase project URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` — Your Supabase anonymous key

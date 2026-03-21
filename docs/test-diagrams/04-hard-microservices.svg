@@ -1,0 +1,100 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" font-family="Arial, sans-serif" font-size="12">
+  <rect width="900" height="600" fill="#1a1a2e" rx="8"/>
+  <text x="450" y="25" text-anchor="middle" fill="#e0e0e0" font-size="16" font-weight="bold">Microservices Architecture (GCP)</text>
+  <text x="450" y="42" text-anchor="middle" fill="#888" font-size="10">Difficulty: Hard</text>
+
+  <!-- External -->
+  <rect x="370" y="55" width="160" height="35" rx="18" fill="#2d3748" stroke="#63b3ed" stroke-width="2"/>
+  <text x="450" y="78" text-anchor="middle" fill="#63b3ed" font-size="11">External Clients</text>
+
+  <!-- API Gateway -->
+  <rect x="355" y="110" width="190" height="40" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="450" y="135" text-anchor="middle" fill="#f6ad55" font-size="11">Cloud API Gateway + Cloud Armor</text>
+
+  <!-- Cloud Load Balancer -->
+  <rect x="370" y="170" width="160" height="35" rx="8" fill="#2d3748" stroke="#f6ad55" stroke-width="2"/>
+  <text x="450" y="192" text-anchor="middle" fill="#f6ad55" font-size="11">Global Load Balancer</text>
+
+  <!-- GKE Cluster -->
+  <rect x="40" y="225" width="820" height="200" rx="8" fill="none" stroke="#4299e1" stroke-width="1.5" stroke-dasharray="8,4"/>
+  <text x="60" y="245" fill="#4299e1" font-size="11" font-weight="bold">GKE Cluster (3 node pools)</text>
+
+  <!-- Services -->
+  <rect x="60" y="260" width="130" height="65" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="125" y="285" text-anchor="middle" fill="#e0e0e0" font-size="10">Auth Service</text>
+  <text x="125" y="300" text-anchor="middle" fill="#fc8181" font-size="9">Go · 3 replicas</text>
+  <text x="125" y="315" text-anchor="middle" fill="#888" font-size="9">JWT + OAuth2</text>
+
+  <rect x="210" y="260" width="130" height="65" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="275" y="285" text-anchor="middle" fill="#e0e0e0" font-size="10">User Service</text>
+  <text x="275" y="300" text-anchor="middle" fill="#68d391" font-size="9">Python · 4 replicas</text>
+  <text x="275" y="315" text-anchor="middle" fill="#888" font-size="9">CRUD + Profiles</text>
+
+  <rect x="360" y="260" width="130" height="65" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="425" y="285" text-anchor="middle" fill="#e0e0e0" font-size="10">Order Service</text>
+  <text x="425" y="300" text-anchor="middle" fill="#b794f4" font-size="9">Java · 5 replicas</text>
+  <text x="425" y="315" text-anchor="middle" fill="#888" font-size="9">Transactions</text>
+
+  <rect x="510" y="260" width="130" height="65" rx="8" fill="#2d3748" stroke="#f6e05e" stroke-width="2"/>
+  <text x="575" y="285" text-anchor="middle" fill="#e0e0e0" font-size="10">Payment Service</text>
+  <text x="575" y="300" text-anchor="middle" fill="#f6e05e" font-size="9">Node.js · 3 replicas</text>
+  <text x="575" y="315" text-anchor="middle" fill="#888" font-size="9">Stripe + PCI</text>
+
+  <rect x="660" y="260" width="130" height="65" rx="8" fill="#2d3748" stroke="#f687b3" stroke-width="2"/>
+  <text x="725" y="285" text-anchor="middle" fill="#e0e0e0" font-size="10">Notification Svc</text>
+  <text x="725" y="300" text-anchor="middle" fill="#f687b3" font-size="9">Go · 2 replicas</text>
+  <text x="725" y="315" text-anchor="middle" fill="#888" font-size="9">Email + Push</text>
+
+  <!-- Message Bus -->
+  <rect x="180" y="350" width="540" height="35" rx="8" fill="#2d3748" stroke="#ed8936" stroke-width="2"/>
+  <text x="450" y="373" text-anchor="middle" fill="#ed8936" font-size="11">Cloud Pub/Sub (Event Bus)</text>
+
+  <!-- Istio -->
+  <rect x="60" y="345" width="100" height="45" rx="8" fill="#2d3748" stroke="#4299e1" stroke-width="1.5"/>
+  <text x="110" y="365" text-anchor="middle" fill="#e0e0e0" font-size="10">Istio</text>
+  <text x="110" y="380" text-anchor="middle" fill="#4299e1" font-size="9">Service Mesh</text>
+
+  <!-- Data Layer -->
+  <rect x="60" y="445" width="140" height="55" rx="8" fill="#2d3748" stroke="#68d391" stroke-width="2"/>
+  <text x="130" y="468" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud SQL</text>
+  <text x="130" y="485" text-anchor="middle" fill="#68d391" font-size="10">PostgreSQL HA</text>
+
+  <rect x="220" y="445" width="130" height="55" rx="8" fill="#2d3748" stroke="#b794f4" stroke-width="2"/>
+  <text x="285" y="468" text-anchor="middle" fill="#e0e0e0" font-size="11">Memorystore</text>
+  <text x="285" y="485" text-anchor="middle" fill="#b794f4" font-size="10">Redis Cache</text>
+
+  <rect x="370" y="445" width="130" height="55" rx="8" fill="#2d3748" stroke="#f6e05e" stroke-width="2"/>
+  <text x="435" y="468" text-anchor="middle" fill="#e0e0e0" font-size="11">Cloud Storage</text>
+  <text x="435" y="485" text-anchor="middle" fill="#f6e05e" font-size="10">Object Store</text>
+
+  <rect x="520" y="445" width="130" height="55" rx="8" fill="#2d3748" stroke="#fc8181" stroke-width="2"/>
+  <text x="585" y="468" text-anchor="middle" fill="#e0e0e0" font-size="11">BigQuery</text>
+  <text x="585" y="485" text-anchor="middle" fill="#fc8181" font-size="10">Analytics DW</text>
+
+  <rect x="670" y="445" width="140" height="55" rx="8" fill="#2d3748" stroke="#f687b3" stroke-width="2"/>
+  <text x="740" y="468" text-anchor="middle" fill="#e0e0e0" font-size="11">Secret Manager</text>
+  <text x="740" y="485" text-anchor="middle" fill="#f687b3" font-size="10">Keys + Certs</text>
+
+  <!-- Monitoring sidebar -->
+  <rect x="780" y="110" width="95" height="110" rx="8" fill="#2d3748" stroke="#4fd1c5" stroke-width="1.5"/>
+  <text x="828" y="135" text-anchor="middle" fill="#4fd1c5" font-size="10">Monitoring</text>
+  <text x="828" y="155" text-anchor="middle" fill="#888" font-size="9">Cloud Logging</text>
+  <text x="828" y="170" text-anchor="middle" fill="#888" font-size="9">Cloud Trace</text>
+  <text x="828" y="185" text-anchor="middle" fill="#888" font-size="9">Cloud Monitor</text>
+  <text x="828" y="200" text-anchor="middle" fill="#888" font-size="9">Prometheus</text>
+
+  <!-- Arrows -->
+  <defs><marker id="a4" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="450" y1="90" x2="450" y2="110" stroke="#888" stroke-width="1.5" marker-end="url(#a4)"/>
+  <line x1="450" y1="150" x2="450" y2="170" stroke="#888" stroke-width="1.5" marker-end="url(#a4)"/>
+  <line x1="450" y1="205" x2="450" y2="225" stroke="#888" stroke-width="1.5" marker-end="url(#a4)"/>
+  <line x1="125" y1="325" x2="125" y2="345" stroke="#888" stroke-width="1" marker-end="url(#a4)"/>
+  <line x1="275" y1="325" x2="275" y2="350" stroke="#888" stroke-width="1" marker-end="url(#a4)"/>
+  <line x1="425" y1="325" x2="425" y2="350" stroke="#888" stroke-width="1" marker-end="url(#a4)"/>
+  <line x1="575" y1="325" x2="575" y2="350" stroke="#888" stroke-width="1" marker-end="url(#a4)"/>
+  <line x1="725" y1="325" x2="725" y2="350" stroke="#888" stroke-width="1" marker-end="url(#a4)"/>
+  <line x1="130" y1="385" x2="130" y2="445" stroke="#888" stroke-width="1.5" marker-end="url(#a4)"/>
+  <line x1="285" y1="385" x2="285" y2="445" stroke="#888" stroke-width="1.5" marker-end="url(#a4)"/>
+  <line x1="435" y1="385" x2="435" y2="445" stroke="#888" stroke-width="1.5" marker-end="url(#a4)"/>
+  <line x1="585" y1="385" x2="585" y2="445" stroke="#888" stroke-width="1.5" marker-end="url(#a4)"/>
+</svg>
