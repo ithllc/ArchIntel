@@ -1,0 +1,74 @@
+{# Technical Implementation Plan Template - Portable #}
+# Technical Implementation Plan: {{ product_name }}
+
+## Overview
+{{ overview }}
+{% if source_prd %}
+> Source PRD: `{{ source_prd }}`
+{% endif %}
+
+## Architecture
+{{ architecture.description }}
+
+{% if architecture.mermaid_diagram %}
+```mermaid
+{{ architecture.mermaid_diagram }}
+```
+{% endif %}
+
+{% for phase in phases %}
+## Phase {{ loop.index }}: {{ phase.name }}
+**Objective:** {{ phase.objective }}
+**Depends on:** {{ phase.depends_on | join(', ') if phase.depends_on else 'None' }}
+
+### Implementation Steps
+{% for step in phase.steps %}
+{{ loop.index }}. {{ step }}
+{% endfor %}
+
+{% if phase.files %}
+### Files
+{% for f in phase.files %}
+- `{{ f.path }}` - {{ f.purpose }} ({{ f.action }})
+{% endfor %}
+{% endif %}
+
+{% if phase.api_contracts %}
+### API Contracts
+{% for api in phase.api_contracts %}
+- `{{ api.method }} {{ api.endpoint }}` - {{ api.description }}
+{%- if api.request %}
+  - Request: `{{ api.request }}`
+{%- endif %}
+{%- if api.response %}
+  - Response: `{{ api.response }}`
+{%- endif %}
+{% endfor %}
+{% endif %}
+
+---
+
+{% endfor %}
+
+{% if dependency_graph %}
+## Dependency Graph
+```mermaid
+{{ dependency_graph }}
+```
+{% endif %}
+
+{% if risks %}
+## Risk Assessment
+| Risk | Impact | Likelihood | Mitigation |
+|------|--------|------------|------------|
+{% for risk in risks %}
+| {{ risk.risk }} | {{ risk.impact }} | {{ risk.likelihood }} | {{ risk.mitigation }} |
+{% endfor %}
+{% endif %}
+
+{% if success_criteria %}
+## Success Criteria
+{% for criterion in success_criteria %}
+- [ ] {{ criterion }}
+{% endfor %}
+{% endif %}

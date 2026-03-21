@@ -1,0 +1,60 @@
+{# PRD Template - Standard 7-section format for any project #}
+# Product Requirements Document (PRD): {{ product_name }}
+
+## 1. Introduction
+**{{ product_name }}** is {{ elevator_pitch }}
+{%- if licensing %} Distributed under the **{{ licensing }}**,{% endif %} it {{ problem_statement }}
+
+## 2. Target Audience
+{% for audience in target_audience -%}
+- **{{ audience.persona }}:** {{ audience.description }}
+{% endfor %}
+
+## 3. Scope & Constraints
+- **Jurisdictions/Markets:** {{ scope.jurisdictions | default('[TBD]') }}
+- **Licensing:** **{{ scope.licensing | default('[TBD]') }}**.
+- **Deployment:** **{{ scope.deployment | default('[TBD]') }}** for {{ scope.deployment_rationale | default('optimal performance') }}.
+- **Security:** {{ scope.security | default('[TBD]') }}
+{% if out_of_scope %}
+
+**Out of Scope:**
+{% for item in out_of_scope -%}
+- {{ item }}
+{% endfor %}
+{%- endif %}
+
+## 4. Key Features
+{% for feature in features %}
+### 4.{{ loop.index }}. {{ feature.name }}
+- {{ feature.description }}
+{%- if feature.interaction %}
+- **User Interaction:** {{ feature.interaction }}
+{%- endif %}
+{%- if feature.ai_models %}
+- **AI/Models:** {{ feature.ai_models }}
+{%- endif %}
+{% endfor %}
+
+## 5. User Stories
+{% for story in user_stories -%}
+{{ loop.index }}.  *{{ story }}*
+{% endfor %}
+
+## 6. Technical Requirements
+- **Backend:** {{ tech_stack.backend | default('[TBD]') }}.
+- **Frontend:** {{ tech_stack.frontend | default('[TBD]') }}.
+{%- if tech_stack.ai_models %}
+- **AI Models:** {{ tech_stack.ai_models }}.
+{%- endif %}
+{%- if tech_stack.data %}
+- **Data:** {{ tech_stack.data }}.
+{%- endif %}
+- **Privacy:** {{ tech_stack.privacy | default('[TBD]') }}.
+{%- if accessibility %}
+- **Accessibility:** {{ accessibility }}.
+{%- endif %}
+
+## 7. Success Metrics
+{% for metric in success_metrics -%}
+- **{{ metric.category }}:** {{ metric.target }}
+{% endfor %}

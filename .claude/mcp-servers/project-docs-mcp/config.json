@@ -1,0 +1,63 @@
+{
+  "name": "project-docs-mcp",
+  "description": "Project documentation management MCP server - shared data layer for prd-generator, technical-planner, and project-manager skills",
+  "version": "1.0.0",
+  "command": "python",
+  "args": [
+    ".claude/mcp-servers/project-docs-mcp/server.py"
+  ],
+  "env": {},
+  "tools": [
+    {
+      "name": "list_documents",
+      "description": "List all project documentation files, optionally filtered by directory"
+    },
+    {
+      "name": "read_document",
+      "description": "Read a documentation file by relative path within docs/"
+    },
+    {
+      "name": "write_document",
+      "description": "Create or overwrite a documentation file (PRDs, plans, etc.)"
+    },
+    {
+      "name": "update_document_section",
+      "description": "Update a specific section of a doc by heading match"
+    },
+    {
+      "name": "query_features",
+      "description": "Search the feature roadmap by keyword, classification, or group"
+    },
+    {
+      "name": "get_project_context",
+      "description": "Get project state summary: docs, kanban, skills inventory"
+    },
+    {
+      "name": "get_prd_template",
+      "description": "Get the standard PRD template structure"
+    },
+    {
+      "name": "get_plan_template",
+      "description": "Get the standard technical implementation plan template"
+    }
+  ],
+  "installation": {
+    "prerequisites": [
+      "Python 3.11+",
+      "MCP SDK (pip install mcp)"
+    ],
+    "steps": [
+      "pip install -r .claude/mcp-servers/project-docs-mcp/requirements.txt"
+    ]
+  },
+  "claude_desktop_config": {
+    "mcpServers": {
+      "project_docs": {
+        "command": "python",
+        "args": [
+          "/path/to/OpenTaxCopilot/.claude/mcp-servers/project-docs-mcp/server.py"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "name": "gemini-mcp",
+  "description": "Gemini CLI integration for OpenTaxCopilot - Google product expertise, tax authority research, and ADK consultation",
+  "version": "1.0.0",
+  "command": "python",
+  "args": [
+    ".claude/mcp-servers/gemini-mcp/server.py",
+    "--mode",
+    "stdio"
+  ],
+  "env": {
+    "GEMINI_ENABLED": "true",
+    "GEMINI_TIMEOUT": "300",
+    "GEMINI_RATE_LIMIT": "2",
+    "GEMINI_DAILY_LIMIT": "250",
+    "GEMINI_AUTO_CONSULT": "false"
+  },
+  "tools": [
+    {
+      "name": "consult_gemini",
+      "description": "Get AI assistance from Gemini for Google products, frameworks, ADK, or tax-related queries"
+    },
+    {
+      "name": "analyze_google_integration",
+      "description": "Analyze codebase for Google ADK, Gemini API, or Vertex AI integration issues"
+    },
+    {
+      "name": "research_tax_authority_api",
+      "description": "Research tax authority APIs and official portals for a specific jurisdiction"
+    },
+    {
+      "name": "troubleshoot_google_error",
+      "description": "Troubleshoot errors related to Google products/frameworks"
+    },
+    {
+      "name": "security_review",
+      "description": "Run security review on Google Cloud configurations"
+    },
+    {
+      "name": "gemini_status",
+      "description": "Get Gemini CLI integration status"
+    },
+    {
+      "name": "gemini_quota_status",
+      "description": "Get daily quota status (requests made, remaining, limit)"
+    }
+  ],
+  "installation": {
+    "prerequisites": [
+      "Node.js 18+ (for Gemini CLI)",
+      "Python 3.11+",
+      "Gemini CLI authenticated (gemini auth)"
+    ],
+    "steps": [
+      "npm install -g @google/gemini-cli",
+      "gemini auth",
+      "pip install -r .claude/mcp-servers/gemini-mcp/requirements.txt"
+    ]
+  },
+  "claude_desktop_config": {
+    "mcpServers": {
+      "gemini": {
+        "command": "python",
+        "args": [
+          "/path/to/OpenTaxCopilot/.claude/mcp-servers/gemini-mcp/server.py",
+          "--mode",
+          "stdio"
+        ]
+      }
+    }
+  }
+}
