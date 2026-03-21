@@ -177,7 +177,7 @@ export function VoicePanel({ diagramFile, onPipelineTrigger, pipelineStatus, thr
       const tokenData = await tokenResp.json();
       if (tokenData.error) throw new Error(tokenData.error);
 
-      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent?access_token=${tokenData.token}`;
+      const wsUrl = `wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent?key=${tokenData.apiKey}`;
       const ws = new WebSocket(wsUrl);
       wsRef.current = ws;
 
@@ -349,7 +349,11 @@ When citing specific numbers or findings, say "according to our analysis" to ind
         setIsConnecting(false);
       };
 
-      ws.onclose = () => {
+      ws.onclose = (e) => {
+        console.log('WebSocket closed:', e.code, e.reason);
+        if (e.code !== 1000 && e.code !== 1005) {
+          setError(`Voice session ended (code: ${e.code}). Please try again.`);
+        }
         setIsConnected(false);
         setIsConnecting(false);
         cleanup();
