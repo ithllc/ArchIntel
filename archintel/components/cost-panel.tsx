@@ -1,7 +1,8 @@
 'use client';
 
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useChat } from '@ai-sdk/react';
-import { useState, useRef, useEffect } from 'react';
+import { DefaultChatTransport } from 'ai';
 import ReactMarkdown from 'react-markdown';
 import { DollarSign, Send, Loader2, TrendingDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -11,31 +12,56 @@ interface CostPanelProps {
   diagramFile: File | null;
 }
 
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  for (let i = 0; i < bytes.byteLength; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
+}
+
 export function CostPanel({ diagramFile }: CostPanelProps) {
   const [hasStarted, setHasStarted] = useState(false);
   const [inputText, setInputText] = useState('');
+  const diagramRef = useRef<{ base64: string; mimeType: string } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { messages, sendMessage, status } = useChat();
+  useEffect(() => {
+    if (diagramFile) {
+      diagramFile.arrayBuffer().then(buf => {
+        diagramRef.current = {
+          base64: arrayBufferToBase64(buf),
+          mimeType: diagramFile.type || 'image/png',
+        };
+      });
+    } else {
+      diagramRef.current = null;
+    }
+  }, [diagramFile]);
+
+  const transport = useMemo(() => new DefaultChatTransport({
+    api: '/api/chat',
+    prepareSendMessagesRequest({ messages: msgs }) {
+      return {
+        body: {
+          messages: msgs,
+          diagramBase64: diagramRef.current?.base64 ?? null,
+          diagramMimeType: diagramRef.current?.mimeType ?? 'image/png',
+        },
+      };
+    },
+  }), []);
+
+  const { messages, sendMessage, status } = useChat({ transport });
 
   const isLoading = status === 'streaming' || status === 'submitted';
 
-  const startAnalysis = async () => {
-    if (!diagramFile) return;
+  const startAnalysis = () => {
+    if (!diagramFile || !diagramRef.current) return;
     setHasStarted(true);
-
-    const buffer = await diagramFile.arrayBuffer();
-    const base64 = btoa(
-      new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), '')
-    );
-
     sendMessage({
       text: 'Analyze this architecture diagram and identify all cloud services. Then ask me about our expected traffic so you can estimate costs.',
-      files: [{
-        type: 'file' as const,
-        mediaType: diagramFile.type || 'image/png',
-        url: `data:${diagramFile.type || 'image/png'};base64,${base64}`,
-      }],
     });
   };
 

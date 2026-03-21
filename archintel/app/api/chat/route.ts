@@ -1,4 +1,4 @@
-import { streamText, tool } from 'ai';
+import { streamText, tool, convertToModelMessages } from 'ai';
 import { google } from '@ai-sdk/google';
 import { z } from 'zod';
 import { CLOUD_PRICING } from '@/lib/pricing-data';
@@ -8,7 +8,32 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
-    const { messages } = await req.json();
+    const body = await req.json();
+    const { messages: uiMessages, diagramBase64, diagramMimeType } = body;
+
+    // Convert UIMessages from useChat to ModelMessages for streamText
+    const modelMessages = await convertToModelMessages(uiMessages);
+
+    // If a diagram is provided, prepend it as an image in the first user message
+    if (diagramBase64 && modelMessages.length > 0) {
+      const firstUserIdx = modelMessages.findIndex(m => m.role === 'user');
+      if (firstUserIdx >= 0) {
+        const msg = modelMessages[firstUserIdx];
+        // Extract text from existing content
+        const textContent = typeof msg.content === 'string'
+          ? msg.content
+          : Array.isArray(msg.content)
+            ? msg.content.filter(p => p.type === 'text').map(p => (p as { text: string }).text).join('\n')
+            : '';
+        modelMessages[firstUserIdx] = {
+          role: 'user',
+          content: [
+            { type: 'image' as const, image: Buffer.from(diagramBase64, 'base64') },
+            { type: 'text' as const, text: textContent },
+          ],
+        };
+      }
+    }
 
     const systemMessage = `You are CostSight, an expert cloud FinOps analyst within the ArchIntel platform. Your job is to:
 
@@ -26,7 +51,7 @@ Format cost breakdowns as clean tables. Always end with 1-2 optimization suggest
     const result = streamText({
       model: google('gemini-1.5-pro'),
       system: systemMessage,
-      messages,
+      messages: modelMessages,
       tools: {
         identifyServices: tool({
           description: 'Identify and catalog cloud services found in the architecture diagram',

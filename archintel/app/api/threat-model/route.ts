@@ -35,7 +35,7 @@ export async function POST(req: Request) {
           content: [
             {
               type: 'image',
-              image: `data:${mimeType};base64,${buffer.toString('base64')}`,
+              image: buffer,
             },
             {
               type: 'text',
