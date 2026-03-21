@@ -244,7 +244,9 @@ When citing specific numbers or findings, say "according to our analysis" to ind
       };
 
       ws.onmessage = async (event) => {
-        const msg = JSON.parse(event.data);
+        // Browser WebSocket receives Blob by default — convert to text for JSON parsing
+        const raw = event.data instanceof Blob ? await event.data.text() : event.data;
+        const msg = JSON.parse(raw);
 
         if (msg.setupComplete) {
           console.log('Gemini Live session established');
