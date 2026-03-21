@@ -1,13 +1,20 @@
 'use client';
 
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Mic, MicOff, Phone, PhoneOff, Volume2, Loader2 } from 'lucide-react';
+import { Mic, MicOff, Phone, PhoneOff, Volume2, Loader2, Shield, DollarSign, Check, AlertTriangle } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { formatThreatSummaryForVoice, formatCostSummaryForVoice } from '@/lib/format-voice-context';
+import type { ThreatResults } from '@/lib/parse-threat-stream';
+import type { PipelineStatus, CostResults } from '@/lib/pipeline-types';
 
 interface VoicePanelProps {
   diagramFile: File | null;
+  onPipelineTrigger?: (file: File) => void;
+  pipelineStatus?: { threat: PipelineStatus; cost: PipelineStatus };
+  threatResults?: ThreatResults | null;
+  costResults?: CostResults | null;
 }
 
 interface TranscriptEntry {
@@ -45,7 +52,19 @@ function downsample(buffer: Float32Array, fromRate: number, toRate: number): Flo
   return result;
 }
 
-export function VoicePanel({ diagramFile }: VoicePanelProps) {
+function PipelineStatusPill({ label, status, icon: Icon }: { label: string; status: PipelineStatus; icon: React.ComponentType<{ className?: string }> }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Icon className="h-3 w-3" />
+      <span>{label}</span>
+      {status === 'running' && <Loader2 className="h-3 w-3 animate-spin text-blue-400" />}
+      {status === 'complete' && <Check className="h-3 w-3 text-green-400" />}
+      {status === 'error' && <AlertTriangle className="h-3 w-3 text-yellow-400" />}
+    </div>
+  );
+}
+
+export function VoicePanel({ diagramFile, onPipelineTrigger, pipelineStatus, threatResults, costResults }: VoicePanelProps) {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -62,10 +81,46 @@ export function VoicePanel({ diagramFile }: VoicePanelProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isMutedRef = useRef(false);
   const assistantTextRef = useRef('');
+  const threatInjectedRef = useRef(false);
+  const costInjectedRef = useRef(false);
 
   useEffect(() => {
     isMutedRef.current = isMuted;
   }, [isMuted]);
+
+  // Inject threat results into voice context when they arrive
+  useEffect(() => {
+    if (threatResults && !threatInjectedRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
+      const summary = formatThreatSummaryForVoice(threatResults);
+      wsRef.current.send(JSON.stringify({
+        clientContent: {
+          turns: [{
+            role: 'user',
+            parts: [{ text: summary }]
+          }],
+          turnComplete: true
+        }
+      }));
+      threatInjectedRef.current = true;
+    }
+  }, [threatResults]);
+
+  // Inject cost results into voice context when they arrive
+  useEffect(() => {
+    if (costResults && !costInjectedRef.current && wsRef.current?.readyState === WebSocket.OPEN) {
+      const summary = formatCostSummaryForVoice(costResults);
+      wsRef.current.send(JSON.stringify({
+        clientContent: {
+          turns: [{
+            role: 'user',
+            parts: [{ text: summary }]
+          }],
+          turnComplete: true
+        }
+      }));
+      costInjectedRef.current = true;
+    }
+  }, [costResults]);
 
   const playAudio = useCallback((base64Data: string) => {
     if (!playbackCtxRef.current) {
@@ -114,6 +169,8 @@ export function VoicePanel({ diagramFile }: VoicePanelProps) {
     setIsConnecting(true);
     setError(null);
     assistantTextRef.current = '';
+    threatInjectedRef.current = false;
+    costInjectedRef.current = false;
 
     try {
       const tokenResp = await fetch('/api/ephemeral-token');
@@ -152,11 +209,16 @@ export function VoicePanel({ diagramFile }: VoicePanelProps) {
 
 When the user shows you a diagram or asks about their architecture:
 1. Describe what you see in the diagram
-2. Identify key security threats using STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)
-3. Provide rough cost estimates for the cloud services you identify
-4. Suggest specific remediations
+2. Give a brief initial security and cost overview based on what you see
 
-Be concise but thorough. Speak naturally. Keep responses under 30 seconds of speech.`
+IMPORTANT: You will receive structured analysis data marked with [SECURITY ANALYSIS COMPLETE] and [COST ANALYSIS COMPLETE] during the conversation. When you receive this data:
+- Use it to answer specific questions about threats, costs, and remediations
+- Reference specific threat names, severities, and Terraform filenames from the data
+- Reference specific cost figures and service breakdowns from the data
+- When asked about Terraform, refer the user to the Security tab where files are displayed
+
+Be concise but thorough. Speak naturally. Keep responses under 30 seconds of speech.
+When citing specific numbers or findings, say "according to our analysis" to indicate the data is from the automated pipeline.`
               }]
             }
           }
@@ -171,6 +233,11 @@ Be concise but thorough. Speak naturally. Keep responses under 30 seconds of spe
           console.log('Gemini Live session established');
           setIsConnected(true);
           setIsConnecting(false);
+
+          // Trigger automated analysis pipeline
+          if (diagramFile && onPipelineTrigger) {
+            onPipelineTrigger(diagramFile);
+          }
 
           // Start microphone
           try {
@@ -225,7 +292,7 @@ Be concise but thorough. Speak naturally. Keep responses under 30 seconds of spe
               clientContent: {
                 turns: [{
                   role: 'user',
-                  parts: [{ text: 'I just uploaded an architecture diagram. Please analyze it for security threats and give me a brief overview.' }]
+                  parts: [{ text: 'I just uploaded an architecture diagram. Please analyze it for security threats and give me a brief overview. I have also kicked off automated security and cost analyses that will provide detailed findings shortly.' }]
                 }],
                 turnComplete: true
               }
@@ -367,6 +434,17 @@ Be concise but thorough. Speak naturally. Keep responses under 30 seconds of spe
         </div>
       </div>
 
+      {/* Pipeline Status Bar */}
+      {pipelineStatus && (pipelineStatus.threat !== 'idle' || pipelineStatus.cost !== 'idle') && (
+        <Card className="p-3 bg-card/50 border-border">
+          <div className="flex items-center gap-6 text-xs text-muted-foreground">
+            <span className="font-medium">Auto-analyzing:</span>
+            <PipelineStatusPill label="Security" status={pipelineStatus.threat} icon={Shield} />
+            <PipelineStatusPill label="Costs" status={pipelineStatus.cost} icon={DollarSign} />
+          </div>
+        </Card>
+      )}
+
       {!isConnected && !isConnecting && (
         <Card className="p-6 bg-card/50 border-border text-center">
           <div className="space-y-3">
@@ -375,7 +453,7 @@ Be concise but thorough. Speak naturally. Keep responses under 30 seconds of spe
             </div>
             <p className="text-sm text-muted-foreground">
               Start a voice session to talk with ArchIntel about your architecture.
-              Your diagram will be shared automatically.
+              Security and cost analyses will run automatically.
             </p>
             <p className="text-xs text-muted-foreground/60">
               Powered by Gemini 2.5 Flash Native Audio

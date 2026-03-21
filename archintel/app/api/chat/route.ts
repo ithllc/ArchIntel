@@ -49,7 +49,7 @@ When you identify services from a diagram, IMMEDIATELY use identifyServices to c
 Format cost breakdowns as clean tables. Always end with 1-2 optimization suggestions.`;
 
     const result = streamText({
-      model: google('gemini-1.5-pro'),
+      model: google('gemini-2.5-flash'),
       system: systemMessage,
       messages: modelMessages,
       tools: {

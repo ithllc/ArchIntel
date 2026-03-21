@@ -6,10 +6,14 @@ import { DefaultChatTransport } from 'ai';
 import ReactMarkdown from 'react-markdown';
 import { DollarSign, Send, Loader2, TrendingDown } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import type { PipelineStatus, CostResults } from '@/lib/pipeline-types';
 
 interface CostPanelProps {
   diagramFile: File | null;
+  pipelineStatus?: PipelineStatus;
+  pipelineResults?: CostResults | null;
 }
 
 function arrayBufferToBase64(buffer: ArrayBuffer): string {
@@ -21,7 +25,7 @@ function arrayBufferToBase64(buffer: ArrayBuffer): string {
   return btoa(binary);
 }
 
-export function CostPanel({ diagramFile }: CostPanelProps) {
+export function CostPanel({ diagramFile, pipelineStatus, pipelineResults }: CostPanelProps) {
   const [hasStarted, setHasStarted] = useState(false);
   const [inputText, setInputText] = useState('');
   const diagramRef = useRef<{ base64: string; mimeType: string } | null>(null);
@@ -74,7 +78,7 @@ export function CostPanel({ diagramFile }: CostPanelProps) {
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, pipelineResults]);
 
   if (!diagramFile) {
     return (
@@ -91,6 +95,17 @@ export function CostPanel({ diagramFile }: CostPanelProps) {
         <div className="flex items-center gap-2">
           <DollarSign className="h-5 w-5 text-green-400" />
           <h2 className="text-lg font-semibold">Cost Estimation</h2>
+          {pipelineResults && !hasStarted && (
+            <Badge className="bg-purple-900/30 text-purple-400 border-purple-700 text-xs">
+              Auto-estimated via Voice
+            </Badge>
+          )}
+          {pipelineStatus === 'running' && !pipelineResults && !hasStarted && (
+            <Badge className="bg-blue-900/30 text-blue-400 border-blue-700 text-xs animate-pulse">
+              <Loader2 className="h-3 w-3 animate-spin mr-1" />
+              Auto-estimating...
+            </Badge>
+          )}
         </div>
         {!hasStarted && (
           <button
@@ -99,62 +114,118 @@ export function CostPanel({ diagramFile }: CostPanelProps) {
             className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-secondary disabled:text-muted-foreground text-white rounded-lg flex items-center gap-2 transition-colors text-sm font-medium"
           >
             <TrendingDown className="h-4 w-4" />
-            Estimate Costs
+            {pipelineResults ? 'Refine with Chat' : 'Estimate Costs'}
           </button>
         )}
       </div>
 
-      <ScrollArea className="h-[400px]">
-        <div className="space-y-4 p-1">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              <Card
-                className={`max-w-[85%] p-3 ${
-                  message.role === 'user'
-                    ? 'bg-green-900/30 border-green-800'
-                    : 'bg-card border-border'
-                }`}
-              >
-                <div className="prose prose-invert prose-sm max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-td:text-muted-foreground prose-th:text-foreground">
-                  <ReactMarkdown>
-                    {message.parts
-                      ?.filter((p): p is { type: 'text'; text: string } => p.type === 'text')
-                      .map(p => p.text)
-                      .join('') || ''}
-                  </ReactMarkdown>
+      {/* Pipeline auto-results (shown when not in conversational mode) */}
+      {pipelineResults && !hasStarted && (
+        <ScrollArea className="h-[400px]">
+          <div className="space-y-4 p-1">
+            {/* Summary Card */}
+            <Card className="p-4 bg-green-900/10 border-green-800">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-sm font-medium text-green-400">Estimated Monthly Cost</span>
+                <span className="text-2xl font-bold text-green-400">${pipelineResults.totalMonthlyCost}</span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Annual estimate: ${pipelineResults.annualEstimate} | Based on default assumptions
+              </div>
+            </Card>
+
+            {/* Breakdown Table */}
+            {pipelineResults.breakdown.length > 0 && (
+              <Card className="p-4 bg-card border-border">
+                <h3 className="text-sm font-medium mb-3">Service Breakdown</h3>
+                <div className="space-y-2">
+                  {pipelineResults.breakdown
+                    .filter(s => s.monthlyCost > 0)
+                    .sort((a, b) => b.monthlyCost - a.monthlyCost)
+                    .map((service, i) => (
+                      <div key={i} className="flex items-center justify-between py-1 border-b border-border/50 last:border-0">
+                        <div>
+                          <span className="text-sm">{service.name}</span>
+                          {service.description && (
+                            <span className="text-xs text-muted-foreground ml-2">({service.description})</span>
+                          )}
+                        </div>
+                        <span className="text-sm font-medium text-green-400">${service.monthlyCost}/mo</span>
+                      </div>
+                    ))}
                 </div>
               </Card>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm">Calculating...</span>
-            </div>
-          )}
-          <div ref={scrollRef} />
-        </div>
-      </ScrollArea>
+            )}
+
+            {/* Full Analysis Text */}
+            {pipelineResults.text && (
+              <Card className="p-4 bg-card border-border">
+                <div className="prose prose-invert prose-sm max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-td:text-muted-foreground prose-th:text-foreground">
+                  <ReactMarkdown>{pipelineResults.text}</ReactMarkdown>
+                </div>
+              </Card>
+            )}
+            <div ref={scrollRef} />
+          </div>
+        </ScrollArea>
+      )}
+
+      {/* Conversational mode (manual or after clicking "Refine with Chat") */}
+      {(hasStarted || (!pipelineResults && messages.length === 0)) && !pipelineResults && !hasStarted && null}
 
       {hasStarted && (
-        <form onSubmit={handleSend} className="flex gap-2">
-          <input
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            placeholder="e.g., We expect 1M requests/month with 500GB storage..."
-            className="flex-1 px-3 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500"
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !inputText.trim()}
-            className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-secondary disabled:text-muted-foreground text-white rounded-lg transition-colors"
-          >
-            <Send className="h-4 w-4" />
-          </button>
-        </form>
+        <>
+          <ScrollArea className="h-[400px]">
+            <div className="space-y-4 p-1">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <Card
+                    className={`max-w-[85%] p-3 ${
+                      message.role === 'user'
+                        ? 'bg-green-900/30 border-green-800'
+                        : 'bg-card border-border'
+                    }`}
+                  >
+                    <div className="prose prose-invert prose-sm max-w-none prose-headings:text-foreground prose-p:text-muted-foreground prose-strong:text-foreground prose-li:text-muted-foreground prose-td:text-muted-foreground prose-th:text-foreground">
+                      <ReactMarkdown>
+                        {message.parts
+                          ?.filter((p): p is { type: 'text'; text: string } => p.type === 'text')
+                          .map(p => p.text)
+                          .join('') || ''}
+                      </ReactMarkdown>
+                    </div>
+                  </Card>
+                </div>
+              ))}
+              {isLoading && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Calculating...</span>
+                </div>
+              )}
+              <div ref={scrollRef} />
+            </div>
+          </ScrollArea>
+
+          <form onSubmit={handleSend} className="flex gap-2">
+            <input
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              placeholder="e.g., We expect 1M requests/month with 500GB storage..."
+              className="flex-1 px-3 py-2 bg-secondary border border-border rounded-lg text-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !inputText.trim()}
+              className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-secondary disabled:text-muted-foreground text-white rounded-lg transition-colors"
+            >
+              <Send className="h-4 w-4" />
+            </button>
+          </form>
+        </>
       )}
     </div>
   );

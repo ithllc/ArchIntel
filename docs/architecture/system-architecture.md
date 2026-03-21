@@ -1,6 +1,6 @@
 # ArchIntel System Architecture
 
-> **Version:** 1.1
+> **Version:** 1.2
 > **Last Updated:** 2026-03-21
 > **Status:** Production (Google Cloud Run)
 
@@ -29,6 +29,7 @@ graph TB
 
     subgraph Server["Next.js Server (Cloud Run)"]
         ThreatAPI["/api/threat-model<br/>POST · streamText"]
+        CostAutoAPI["/api/cost-estimate-auto<br/>POST · generateText"]
         ChatAPI["/api/chat<br/>POST · streamText"]
         TokenAPI["/api/ephemeral-token<br/>GET"]
     end
@@ -61,13 +62,17 @@ graph TB
     ThreatClient -->|FormData POST| ThreatAPI
     CostClient -->|JSON POST| ChatAPI
     VoiceClient -->|GET| TokenAPI
+    VoiceClient -.->|Auto-trigger on session start| ThreatAPI
+    VoiceClient -.->|Auto-trigger on session start| CostAutoAPI
 
     ThreatAPI -->|Vercel AI SDK| Gemini15
+    CostAutoAPI -->|Vercel AI SDK| Gemini15
     ChatAPI -->|Vercel AI SDK| Gemini15
     TokenAPI -->|API Key| VoiceClient
 
     ThreatAPI -->|Insert| ThreatTable
     ThreatAPI -->|Insert| PolicyTable
+    CostAutoAPI -->|Insert| CostTable
     ChatAPI -->|Insert| CostTable
     ChatAPI -->|Insert| ChatTable
 
@@ -85,24 +90,40 @@ graph TB
 
 ## 3. Feature Architecture
 
-### 3.1 Voice Analysis (Gemini 2.5 Flash Native Audio)
+### 3.1 Voice Analysis with Automated Pipeline
 
-The voice feature establishes a direct browser-to-Gemini WebSocket connection with zero server-side audio proxying, providing ultra-low latency real-time conversation.
+The voice feature establishes a direct browser-to-Gemini WebSocket connection with zero server-side audio proxying. **On session start, it also auto-triggers STRIDE security analysis and cost estimation in parallel**, feeding structured results back into the voice conversation.
 
 ```mermaid
 sequenceDiagram
     participant User
     participant Browser as Browser<br/>(Voice Panel)
     participant API as /api/ephemeral-token
+    participant ThreatAPI as /api/threat-model
+    participant CostAPI as /api/cost-estimate-auto
     participant Gemini as Gemini 2.5 Flash<br/>Native Audio
 
     User->>Browser: Click "Start Voice Analysis"
     Browser->>API: GET /api/ephemeral-token
     API-->>Browser: { apiKey, model }
 
-    Browser->>Gemini: WebSocket Connect<br/>wss://generativelanguage.googleapis.com/ws/...
+    Browser->>Gemini: WebSocket Connect
     Browser->>Gemini: Setup Config<br/>(model, VAD, transcription, system prompt)
     Gemini-->>Browser: setupComplete
+
+    par Automated Pipeline (concurrent)
+        Browser->>ThreatAPI: POST FormData (diagram)
+        Note right of ThreatAPI: STRIDE analysis +<br/>Terraform generation
+        ThreatAPI-->>Browser: Streamed results
+        Browser->>Browser: Update Security tab
+        Browser->>Gemini: clientContent<br/>[SECURITY ANALYSIS COMPLETE]
+    and
+        Browser->>CostAPI: POST FormData (diagram)
+        Note right of CostAPI: One-shot cost<br/>estimation
+        CostAPI-->>Browser: JSON cost breakdown
+        Browser->>Browser: Update Costs tab
+        Browser->>Gemini: clientContent<br/>[COST ANALYSIS COMPLETE]
+    end
 
     Browser->>Browser: getUserMedia() → Microphone
     Browser->>Gemini: realtimeInput.video<br/>(diagram image, sent once)
@@ -111,12 +132,13 @@ sequenceDiagram
     loop Real-time Audio Stream
         Browser->>Gemini: realtimeInput.audio<br/>(PCM16 @ 16kHz, 512-sample chunks)
         Gemini-->>Browser: serverContent.modelTurn<br/>(PCM16 @ 24kHz audio)
-        Gemini-->>Browser: outputTranscription<br/>(text of spoken response)
-        Browser->>Browser: AudioContext playback<br/>+ transcript display
+        Gemini-->>Browser: outputTranscription
+        Browser->>Browser: AudioContext playback + transcript
     end
 
-    Gemini-->>Browser: inputTranscription<br/>(what user said)
-    Gemini-->>Browser: turnComplete
+    User->>Browser: "What's the most critical threat?"
+    Note over Gemini: References injected<br/>STRIDE data
+    Gemini-->>Browser: Spoken response with<br/>specific threat details
 
     User->>Browser: Click "End Session"
     Browser->>Gemini: WebSocket Close
@@ -128,6 +150,9 @@ sequenceDiagram
 - **VAD Config:** `START_SENSITIVITY_LOW`, `END_SENSITIVITY_HIGH`, `silenceDurationMs: 500`
 - **Image Delivery:** Sent once via `realtimeInput.video` channel on session start
 - **Transcription:** Both `inputAudioTranscription` and `outputAudioTranscription` enabled
+- **Pipeline Trigger:** On `setupComplete`, fires concurrent requests to `/api/threat-model` and `/api/cost-estimate-auto`
+- **Context Injection:** Structured analysis summaries sent via `clientContent.turns` to enrich voice responses
+- **Tab Auto-Population:** Security and Costs tabs display pipeline results without manual clicks
 
 ---
 
@@ -218,6 +243,64 @@ sequenceDiagram
 
 ---
 
+### 3.4 Automated Analysis Pipeline
+
+The pipeline orchestrates all three features from a single user action (starting voice analysis).
+
+```mermaid
+graph LR
+    A["User clicks<br/>Start Voice Analysis"] --> B["WebSocket<br/>setupComplete"]
+    B --> C["triggerPipeline()"]
+    C --> D["POST /api/threat-model<br/>(concurrent)"]
+    C --> E["POST /api/cost-estimate-auto<br/>(concurrent)"]
+    D --> F["threatResults state"]
+    E --> G["costResults state"]
+    F --> H["Security tab<br/>auto-populated"]
+    F --> I["Voice context injection<br/>[SECURITY ANALYSIS COMPLETE]"]
+    G --> J["Costs tab<br/>auto-populated"]
+    G --> K["Voice context injection<br/>[COST ANALYSIS COMPLETE]"]
+
+    style A fill:#7c3aed,color:#fff
+    style D fill:#dc2626,color:#fff
+    style E fill:#16a34a,color:#fff
+```
+
+**State Architecture:**
+
+| State Variable | Owner | Description |
+|---------------|-------|-------------|
+| `pipelineStatus.threat` | `page.tsx` | `idle` \| `running` \| `complete` \| `error` |
+| `pipelineStatus.cost` | `page.tsx` | `idle` \| `running` \| `complete` \| `error` |
+| `threatResults` | `page.tsx` | `{ text, terraformFiles }` from STRIDE analysis |
+| `costResults` | `page.tsx` | `{ text, breakdown, totalMonthlyCost, annualEstimate }` from cost estimation |
+
+**New API Route — `/api/cost-estimate-auto` (POST):**
+
+One-shot cost estimation that accepts a diagram via FormData and returns a complete JSON response (no conversational loop). Uses `generateText` with Gemini 1.5 Pro and inline pricing data.
+
+```
+POST /api/cost-estimate-auto
+Content-Type: multipart/form-data
+Body: { diagram: File }
+
+Response: {
+  text: string,           // Markdown analysis with optimization suggestions
+  breakdown: CostBreakdownItem[],  // Per-service cost data
+  totalMonthlyCost: number,
+  annualEstimate: number
+}
+```
+
+**Voice Context Injection:**
+
+When analysis results arrive, structured summaries are injected into the Gemini Live session via `clientContent.turns`:
+- `formatThreatSummaryForVoice()` — Top threats, severities, Terraform filenames
+- `formatCostSummaryForVoice()` — Total cost, per-service breakdown, optimization hints
+
+This enables the voice model to answer specific questions like "What's my biggest security risk?" or "How much will Cloud Run cost?" using real analysis data.
+
+---
+
 ## 4. Infrastructure & Deployment
 
 ### 4.1 CI/CD Pipeline
@@ -279,24 +362,29 @@ graph TD
 archintel/
 ├── app/
 │   ├── layout.tsx              # Root layout, dark mode, Geist fonts
-│   ├── page.tsx                # Main page with upload + 3-tab layout
+│   ├── page.tsx                # Main page with upload + 3-tab layout + pipeline state
 │   ├── globals.css             # Tailwind v4 + shadcn theme + custom styles
 │   └── api/
 │       ├── threat-model/
 │       │   └── route.ts        # STRIDE analysis (streamText + tool)
+│       ├── cost-estimate-auto/
+│       │   └── route.ts        # One-shot cost estimation (generateText, pipeline)
 │       ├── chat/
-│       │   └── route.ts        # Cost estimation chat (streamText + tools)
+│       │   └── route.ts        # Conversational cost chat (streamText + tools)
 │       └── ephemeral-token/
 │           └── route.ts        # API key for browser WebSocket
 ├── components/
 │   ├── upload-zone.tsx         # Drag-and-drop with preview
-│   ├── voice-panel.tsx         # Gemini Live WebSocket + audio
-│   ├── threat-panel.tsx        # STRIDE results + Terraform display
-│   ├── cost-panel.tsx          # Conversational cost chat
+│   ├── voice-panel.tsx         # Gemini Live WebSocket + audio + pipeline trigger
+│   ├── threat-panel.tsx        # STRIDE results + Terraform + auto-populate
+│   ├── cost-panel.tsx          # Cost chat + auto-populate from pipeline
 │   └── ui/                     # Shadcn UI components
 ├── lib/
 │   ├── supabase.ts             # Supabase client
 │   ├── pricing-data.ts         # Cloud pricing reference (19 services)
+│   ├── parse-threat-stream.ts  # Shared AI SDK stream parser for threat results
+│   ├── pipeline-types.ts       # Shared TypeScript types (PipelineStatus, CostResults)
+│   ├── format-voice-context.ts # Formats analysis results for voice injection
 │   └── utils.ts                # Shadcn utilities
 ├── Dockerfile                  # Multi-stage build for Cloud Run
 ├── cloudbuild.yaml             # CI/CD pipeline definition
@@ -337,7 +425,7 @@ All analysis results are persisted to Supabase PostgreSQL for audit trails and h
 |-------|---------|-----------|
 | `threat_models` | STRIDE analysis text per diagram | `/api/threat-model` (onFinish) |
 | `generated_policies` | Terraform .tf files with threat name + severity | `generateTerraform` tool |
-| `cost_estimates` | Service breakdown + total monthly cost | `calculateCost` tool |
+| `cost_estimates` | Service breakdown + total monthly cost | `calculateCost` tool, `/api/cost-estimate-auto` |
 | `chat_logs` | Conversation summaries | `/api/chat` (onFinish) |
 
 ```mermaid

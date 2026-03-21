@@ -8,6 +8,7 @@
 | 2 | CostSight: UIMessage vs ModelMessage schema mismatch | Blocker | Bug | Costs Tab | [#2](https://github.com/ithllc/ArchIntel/issues/2) |
 | 3 | CostSight: data: URL in sendMessage files rejected | Blocker | Bug | Costs Tab | [#3](https://github.com/ithllc/ArchIntel/issues/3) |
 | 4 | Voice: ephemeral token exposes API key | Moderate | Security | Voice Tab | [#4](https://github.com/ithllc/ArchIntel/issues/4) |
+| 5 | Automated Security & Cost Analysis Pipeline from Voice Analysis | Major | Missing Feature | Voice + Security + Costs | [#5](https://github.com/ithllc/ArchIntel/issues/5) |
 
 ## Logging & Observability Notes
 

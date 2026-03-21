@@ -8,10 +8,8 @@ import { Shield, AlertTriangle, FileCode, Loader2, Copy, Check } from 'lucide-re
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-
-interface ThreatPanelProps {
-  diagramFile: File | null;
-}
+import type { ThreatResults } from '@/lib/parse-threat-stream';
+import type { PipelineStatus } from '@/lib/pipeline-types';
 
 interface TerraformFile {
   filename: string;
@@ -20,17 +18,33 @@ interface TerraformFile {
   severity: string;
 }
 
-export function ThreatPanel({ diagramFile }: ThreatPanelProps) {
+interface ThreatPanelProps {
+  diagramFile: File | null;
+  pipelineStatus?: PipelineStatus;
+  pipelineResults?: ThreatResults | null;
+}
+
+export function ThreatPanel({ diagramFile, pipelineStatus, pipelineResults }: ThreatPanelProps) {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [streamedText, setStreamedText] = useState('');
   const [terraformFiles, setTerraformFiles] = useState<TerraformFile[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [isFromPipeline, setIsFromPipeline] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [streamedText]);
+
+  // Auto-populate from pipeline results
+  useEffect(() => {
+    if (pipelineResults && !isAnalyzing) {
+      setStreamedText(pipelineResults.text);
+      setTerraformFiles(pipelineResults.terraformFiles);
+      setIsFromPipeline(true);
+    }
+  }, [pipelineResults, isAnalyzing]);
 
   const analyze = async () => {
     if (!diagramFile) return;
@@ -39,6 +53,7 @@ export function ThreatPanel({ diagramFile }: ThreatPanelProps) {
     setStreamedText('');
     setTerraformFiles([]);
     setError(null);
+    setIsFromPipeline(false);
 
     try {
       const formData = new FormData();
@@ -68,7 +83,6 @@ export function ThreatPanel({ diagramFile }: ThreatPanelProps) {
         for (const line of lines) {
           if (!line.trim()) continue;
 
-          // AI SDK data stream format: "0:text\n" for text chunks
           if (line.startsWith('0:')) {
             try {
               const text = JSON.parse(line.slice(2));
@@ -78,7 +92,6 @@ export function ThreatPanel({ diagramFile }: ThreatPanelProps) {
             }
           }
 
-          // Tool result format: "a:..." contains tool call results
           if (line.startsWith('a:')) {
             try {
               const toolResults = JSON.parse(line.slice(2));
@@ -97,14 +110,12 @@ export function ThreatPanel({ diagramFile }: ThreatPanelProps) {
             }
           }
 
-          // Tool call format: "9:" contains tool invocations with args
           if (line.startsWith('9:')) {
             try {
               const toolCall = JSON.parse(line.slice(2));
               if (toolCall.toolName === 'generateTerraform' && toolCall.args) {
                 const args = toolCall.args;
                 setTerraformFiles(prev => {
-                  // Avoid duplicates
                   if (prev.some(f => f.filename === args.filename)) return prev;
                   return [...prev, {
                     filename: args.filename,
@@ -148,6 +159,17 @@ export function ThreatPanel({ diagramFile }: ThreatPanelProps) {
         <div className="flex items-center gap-2">
           <Shield className="h-5 w-5 text-red-400" />
           <h2 className="text-lg font-semibold">STRIDE Threat Analysis</h2>
+          {isFromPipeline && !isAnalyzing && streamedText && (
+            <Badge className="bg-purple-900/30 text-purple-400 border-purple-700 text-xs">
+              Auto-analyzed via Voice
+            </Badge>
+          )}
+          {pipelineStatus === 'running' && !isAnalyzing && !streamedText && (
+            <Badge className="bg-blue-900/30 text-blue-400 border-blue-700 text-xs animate-pulse">
+              <Loader2 className="h-3 w-3 animate-spin mr-1" />
+              Auto-analyzing...
+            </Badge>
+          )}
         </div>
         <button
           onClick={analyze}
@@ -157,7 +179,7 @@ export function ThreatPanel({ diagramFile }: ThreatPanelProps) {
           {isAnalyzing ? (
             <><Loader2 className="h-4 w-4 animate-spin" />Analyzing...</>
           ) : (
-            <><AlertTriangle className="h-4 w-4" />Run Analysis</>
+            <><AlertTriangle className="h-4 w-4" />{streamedText ? 'Re-run Analysis' : 'Run Analysis'}</>
           )}
         </button>
       </div>

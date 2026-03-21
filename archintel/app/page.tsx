@@ -1,15 +1,66 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UploadZone } from '@/components/upload-zone';
 import { ThreatPanel } from '@/components/threat-panel';
 import { CostPanel } from '@/components/cost-panel';
 import { VoicePanel } from '@/components/voice-panel';
-import { Shield, DollarSign, Volume2, Zap } from 'lucide-react';
+import { Shield, DollarSign, Volume2, Zap, Loader2, Check, AlertTriangle } from 'lucide-react';
+import { parseThreatStream } from '@/lib/parse-threat-stream';
+import type { ThreatResults } from '@/lib/parse-threat-stream';
+import type { PipelineStatus, CostResults } from '@/lib/pipeline-types';
 
 export default function Home() {
   const [diagramFile, setDiagramFile] = useState<File | null>(null);
+  const [pipelineStatus, setPipelineStatus] = useState<{
+    threat: PipelineStatus;
+    cost: PipelineStatus;
+  }>({ threat: 'idle', cost: 'idle' });
+  const [threatResults, setThreatResults] = useState<ThreatResults | null>(null);
+  const [costResults, setCostResults] = useState<CostResults | null>(null);
+
+  const triggerPipeline = useCallback(async (file: File) => {
+    setPipelineStatus({ threat: 'running', cost: 'running' });
+
+    // Fire both analyses concurrently
+    const threatFormData = new FormData();
+    threatFormData.append('diagram', file);
+
+    const costFormData = new FormData();
+    costFormData.append('diagram', file);
+
+    // Threat analysis — stream response
+    fetch('/api/threat-model', { method: 'POST', body: threatFormData })
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Threat analysis failed');
+        const result = await parseThreatStream(res);
+        setThreatResults(result);
+        setPipelineStatus(prev => ({ ...prev, threat: 'complete' }));
+      })
+      .catch(() => {
+        setPipelineStatus(prev => ({ ...prev, threat: 'error' }));
+      });
+
+    // Cost estimation — one-shot JSON
+    fetch('/api/cost-estimate-auto', { method: 'POST', body: costFormData })
+      .then(async (res) => {
+        if (!res.ok) throw new Error('Cost estimation failed');
+        const result = await res.json();
+        setCostResults(result);
+        setPipelineStatus(prev => ({ ...prev, cost: 'complete' }));
+      })
+      .catch(() => {
+        setPipelineStatus(prev => ({ ...prev, cost: 'error' }));
+      });
+  }, []);
+
+  function StatusIcon({ status }: { status: PipelineStatus }) {
+    if (status === 'running') return <Loader2 className="h-3 w-3 animate-spin" />;
+    if (status === 'complete') return <Check className="h-3 w-3 text-green-400" />;
+    if (status === 'error') return <AlertTriangle className="h-3 w-3 text-yellow-400" />;
+    return null;
+  }
 
   return (
     <div className="min-h-screen">
@@ -45,7 +96,7 @@ export default function Home() {
             {diagramFile && (
               <div className="p-3 bg-card/50 rounded-lg border border-border">
                 <p className="text-xs text-muted-foreground">
-                  Select a tab to analyze security threats, estimate costs, or start a voice conversation.
+                  Start a voice session to automatically analyze security threats, estimate costs, and talk to ArchIntel about your architecture.
                 </p>
               </div>
             )}
@@ -68,6 +119,7 @@ export default function Home() {
                 >
                   <Shield className="h-4 w-4" />
                   Security
+                  <StatusIcon status={pipelineStatus.threat} />
                 </TabsTrigger>
                 <TabsTrigger
                   value="costs"
@@ -75,16 +127,31 @@ export default function Home() {
                 >
                   <DollarSign className="h-4 w-4" />
                   Costs
+                  <StatusIcon status={pipelineStatus.cost} />
                 </TabsTrigger>
               </TabsList>
               <TabsContent value="voice" className="mt-4">
-                <VoicePanel diagramFile={diagramFile} />
+                <VoicePanel
+                  diagramFile={diagramFile}
+                  onPipelineTrigger={triggerPipeline}
+                  pipelineStatus={pipelineStatus}
+                  threatResults={threatResults}
+                  costResults={costResults}
+                />
               </TabsContent>
               <TabsContent value="threats" className="mt-4">
-                <ThreatPanel diagramFile={diagramFile} />
+                <ThreatPanel
+                  diagramFile={diagramFile}
+                  pipelineStatus={pipelineStatus.threat}
+                  pipelineResults={threatResults}
+                />
               </TabsContent>
               <TabsContent value="costs" className="mt-4">
-                <CostPanel diagramFile={diagramFile} />
+                <CostPanel
+                  diagramFile={diagramFile}
+                  pipelineStatus={pipelineStatus.cost}
+                  pipelineResults={costResults}
+                />
               </TabsContent>
             </Tabs>
           </div>

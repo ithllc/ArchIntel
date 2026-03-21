@@ -35,25 +35,30 @@ ArchIntel is an architecture intelligence platform built for the Vercel x DeepMi
 archintel/
 ├── app/
 │   ├── layout.tsx          # Root layout, dark mode, fonts
-│   ├── page.tsx            # Main app page
+│   ├── page.tsx            # Main app page + pipeline state
 │   ├── globals.css         # Tailwind + custom styles
 │   └── api/
 │       ├── threat-model/
 │       │   └── route.ts    # STRIDE analysis endpoint
-│       ├── cost-estimate/
-│       │   └── route.ts    # Cost estimation endpoint
-│       └── chat/
-│           └── route.ts    # Conversational cost chat
+│       ├── cost-estimate-auto/
+│       │   └── route.ts    # One-shot cost estimation (pipeline)
+│       ├── chat/
+│       │   └── route.ts    # Conversational cost chat
+│       └── ephemeral-token/
+│           └── route.ts    # API key for voice WebSocket
 ├── components/
 │   ├── upload-zone.tsx     # Drag-and-drop diagram upload
-│   ├── threat-panel.tsx    # STRIDE results + Terraform output
-│   ├── cost-panel.tsx      # Cost breakdown display
-│   ├── voice-panel.tsx     # Gemini Live voice interaction
+│   ├── threat-panel.tsx    # STRIDE results + Terraform + auto-populate
+│   ├── cost-panel.tsx      # Cost breakdown + auto-populate from pipeline
+│   ├── voice-panel.tsx     # Gemini Live voice + pipeline trigger
 │   └── ui/                 # Shadcn UI components
 ├── lib/
 │   ├── supabase.ts         # Supabase client
 │   ├── pricing-data.ts     # Mocked cloud pricing JSON
-│   └── tools.ts            # Shared AI tool definitions
+│   ├── parse-threat-stream.ts  # Shared AI SDK stream parser
+│   ├── pipeline-types.ts       # Shared types (PipelineStatus, CostResults)
+│   ├── format-voice-context.ts # Voice context injection formatters
+│   └── utils.ts            # Shadcn utilities
 ├── Dockerfile              # Cloud Run deployment
 ├── .env.local              # API keys (never commit)
 └── package.json
@@ -126,13 +131,15 @@ import { z } from 'zod';
 // Tool: generateTerraform → saves to Supabase
 ```
 
-### /api/cost-estimate (POST)
+### /api/cost-estimate-auto (POST)
 ```typescript
 import { generateText } from 'ai';
 import { google } from '@ai-sdk/google';
 
-// Accept image buffer, identify services, calculate costs
-// Tool: calculateCost → returns pricing breakdown
+// One-shot cost estimation for the automated pipeline
+// Accept FormData with diagram image, return JSON with breakdown
+// Uses default assumptions (730 hrs/month, 100GB/month)
+// No conversational loop — returns complete result
 ```
 
 ### /api/chat (POST)

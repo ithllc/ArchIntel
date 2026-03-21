@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const threatModelId = threatModelRow?.id;
 
     const result = streamText({
-      model: google('gemini-1.5-pro'),
+      model: google('gemini-2.5-flash'),
       messages: [
         {
           role: 'user',

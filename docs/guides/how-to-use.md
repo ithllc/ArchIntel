@@ -32,35 +32,45 @@ You will see a dark-mode interface with:
 
 ## Step 2: Choose an Analysis Tab
 
-### Voice Analysis (Purple Tab)
+### Voice Analysis (Purple Tab) — Recommended
 
-Talk to your architecture diagram using natural speech. Gemini sees your diagram and responds with spoken analysis.
+Talk to your architecture diagram using natural speech. **Starting a voice session automatically triggers security and cost analysis in the background** — no extra clicks needed.
 
 1. Click the **Voice** tab (selected by default).
 2. Click **"Start Voice Analysis"**.
 3. Your browser will request **microphone permission** — click Allow.
-4. Gemini will automatically analyze your diagram and begin speaking about what it sees.
-5. **Ask follow-up questions naturally:**
-   - "What are the biggest security risks?"
-   - "How much would this cost per month?"
-   - "Is the database connection secure?"
-   - "What would you change about this architecture?"
-6. A **real-time transcript** appears below as you converse.
-7. Click **"End Session"** when you're finished.
+4. **Three things happen simultaneously:**
+   - Gemini begins analyzing your diagram and speaks about what it sees.
+   - A **STRIDE security analysis** runs automatically in the background (watch the Security tab spinner).
+   - A **cost estimation** runs automatically in the background (watch the Costs tab spinner).
+5. The **pipeline status bar** below the voice controls shows progress:
+   - "Security: running..." with a spinner, then a checkmark when complete.
+   - "Costs: running..." with a spinner, then a checkmark when complete.
+6. Once analyses complete, **ask specific follow-up questions:**
+   - "What are the top 3 security threats?" — answered with actual STRIDE data
+   - "How much will this cost per month?" — answered with actual cost figures
+   - "What Terraform should I apply first?" — references generated policy files
+   - "Which service costs the most?" — uses real cost breakdown
+   - "How do I fix the spoofing vulnerability?" — references specific remediation
+7. Switch to the **Security** or **Costs** tab at any time — results are already populated with an **"Auto-analyzed via Voice"** badge.
+8. A **real-time transcript** appears below as you converse.
+9. Click **"End Session"** when you're finished.
 
 **Controls:**
 - **Mute/Unmute** — Toggle your microphone without ending the session.
 - **LIVE badge** — Green pulsing indicator confirms the connection is active.
+- **Tab spinners** — Security and Costs tabs show spinner/checkmark indicators during the automated pipeline.
 
 ---
 
 ### Security Analysis (Red Tab)
 
-Get a comprehensive STRIDE threat model with auto-generated Terraform remediation policies.
+Get a comprehensive STRIDE threat model with auto-generated Terraform remediation policies. **If you started a voice session first, results are already here.**
 
 1. Click the **Security** tab.
-2. Click **"Run Analysis"**.
-3. The analysis streams in real-time with the following sections:
+2. If results are already populated (from voice pipeline), you'll see an **"Auto-analyzed via Voice"** badge. Click **"Re-run Analysis"** to run a fresh analysis if needed.
+3. If no voice session was started, click **"Run Analysis"** to trigger manually.
+4. The analysis streams in real-time with the following sections:
    - **Architecture Overview** — What Gemini sees in your diagram.
    - **Critical Threats** — High-severity vulnerabilities requiring immediate attention.
    - **Medium Threats** — Moderate risks to address.
@@ -89,11 +99,17 @@ Get a comprehensive STRIDE threat model with auto-generated Terraform remediatio
 
 ### Cost Estimation (Green Tab)
 
-Get a cloud cost breakdown through a conversational interface that asks clarifying questions.
+Get a cloud cost breakdown. **If you started a voice session, an automatic estimate is already here** with total monthly cost and per-service breakdown.
 
 1. Click the **Costs** tab.
-2. Click **"Estimate Costs"**.
-3. CostSight will identify the cloud services in your diagram and ask clarifying questions:
+2. If results are already populated (from voice pipeline), you'll see:
+   - A **summary card** with total monthly and annual estimates.
+   - A **per-service breakdown** table sorted by cost.
+   - The full analysis text with optimization suggestions.
+   - An **"Auto-estimated via Voice"** badge.
+3. Click **"Refine with Chat"** to start a conversational session for more precise estimates with your specific traffic numbers.
+4. If no voice session was started, click **"Estimate Costs"** to trigger manually.
+5. CostSight will identify the cloud services in your diagram and ask clarifying questions:
    - "How many requests per month do you expect?"
    - "What's your estimated data storage volume?"
    - "Which region will this be deployed in?"
