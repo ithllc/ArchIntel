@@ -28,52 +28,45 @@ export async function parseThreatStream(response: Response): Promise<ThreatResul
     buffer = lines.pop() || '';
 
     for (const line of lines) {
-      if (!line.trim()) continue;
+      // UI Message Stream format: "data: {json}"
+      if (!line.startsWith('data: ')) continue;
+      const jsonStr = line.slice(6);
+      if (!jsonStr.trim()) continue;
 
-      if (line.startsWith('0:')) {
-        try {
-          const chunk = JSON.parse(line.slice(2));
-          text += chunk;
-        } catch {
-          // skip malformed
+      try {
+        const evt = JSON.parse(jsonStr);
+
+        // Text delta
+        if (evt.type === 'text' && evt.text) {
+          text += evt.text;
         }
-      }
 
-      if (line.startsWith('a:')) {
-        try {
-          const toolResults = JSON.parse(line.slice(2));
-          for (const result of toolResults) {
-            if (result.type === 'tool-result' && result.result?.filename) {
-              terraformFiles.push({
-                filename: result.result.filename,
-                content: result.result.content || '',
-                threatName: result.result.threatName || '',
-                severity: result.result.severity || 'HIGH',
-              });
-            }
+        // Tool call — extract Terraform from args
+        if (evt.type === 'tool-call' && evt.toolName === 'generateTerraform' && evt.args) {
+          const args = evt.args;
+          if (!terraformFiles.some(f => f.filename === args.filename)) {
+            terraformFiles.push({
+              filename: args.filename,
+              content: args.content,
+              threatName: args.threatName,
+              severity: args.severity,
+            });
           }
-        } catch {
-          // skip
         }
-      }
 
-      if (line.startsWith('9:')) {
-        try {
-          const toolCall = JSON.parse(line.slice(2));
-          if (toolCall.toolName === 'generateTerraform' && toolCall.args) {
-            const args = toolCall.args;
-            if (!terraformFiles.some(f => f.filename === args.filename)) {
-              terraformFiles.push({
-                filename: args.filename,
-                content: args.content,
-                threatName: args.threatName,
-                severity: args.severity,
-              });
-            }
+        // Tool result — also extract if present
+        if (evt.type === 'tool-result' && evt.result?.filename) {
+          if (!terraformFiles.some(f => f.filename === evt.result.filename)) {
+            terraformFiles.push({
+              filename: evt.result.filename,
+              content: evt.result.content || '',
+              threatName: evt.result.threatName || '',
+              severity: evt.result.severity || 'HIGH',
+            });
           }
-        } catch {
-          // skip
         }
+      } catch {
+        // skip malformed JSON
       }
     }
   }
